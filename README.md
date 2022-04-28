@@ -1,3 +1,3 @@
-# schmitz_r-lympohocyte_activation
+# schmitz_r-lymphocyte_activation
 
 adding text
