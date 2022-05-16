@@ -81,10 +81,13 @@ df_data = all_df.copy()
 
 print('All cell activation classifier')
 
+#List of OMI variables we want in the classifier (**Make sure Activation is last item in list)
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix', 'Activation']
 
-#Make copy of main dataframe, then pick out variables we want in the classifier (**Make sure Activation is last)
+   
+#Make copy of main data frame, pull out OMI variables we want in classifier
 all_df_edit = all_df.copy()
-all_df_edit = all_df_edit[['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix', 'Activation']]
+all_df_edit = all_df_edit[list_omi_parameters]
 
 classes = ['CD69-', 'CD69+']
 
