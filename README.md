@@ -1,8 +1,8 @@
-# schmitz_r-lymphocyte_activation
+# Optical metabolic imaging successfully classifies primary human lymphocyte activation
 
-#Optical metabolic imaging successfully classifies primary human lymphocyte activation
+<hr>
 
-#Contents:
+### Contents:
 * updated_b_analysis.py
 * updated_nk_analysis.py
 * updated_all_analysis.py
@@ -10,7 +10,8 @@
 * nk_heatmap.R
 * allcell_hmap.R
 
-#Dataset list:
+<hr> 
+### Dataset list:
 * **NK data 2 groups.csv** - Single-cell OMI data for CD69+ activated and CD69- control NK cells.
 * **NK data all groups.csv** - Single-cell OMI data for NK cells in all four combinations of activation status (CD69-/CD69+) and culture condition (activated/control)
 * **NK_heatmap.csv** - Contents of NK data 2 groups.csv, but formatted for ease of use in R with the ComplexHeatmap package.
@@ -26,29 +27,36 @@
     * Activation: 0 = CD69- control, 1 = CD69+ activated
     * Cell Type: 0 = B-cells, 1 = NK cells, 2 = T-cells
     * Donor: 1-6 same as above, 7 = Donor G, 8 = Donor H, 9 = Donor I, 10 = Donor J, 11 = Donor K, 12 = Donor L
+<hr>
 
-#Software Requirements:
-_Python 3.8:_
-* holoviews 1.14.8
-* numpy 1.20.3
-* pandas 1.3.3
-* scikit-learn 0.24.2
-* umap-learn 0.5.3
+### Software Requirements:
+_Python (3.8):_
+* numpy (1.20.3)
+* pandas (1.3.3)
+* scikit-learn (0.24.2)
+* umap-learn (0.5.3)
+  
+For plots 
+* selenium (4.4.3)
+* geckodriver (0.30.0)
+* holoviews (1.14.8)
+* matplotlib (3.5.1)
 
 _R 4.1.0:_
-* RStudio 1.4.1717
-* circlize 0.4.14
-* ComplexHeatmap 2.10.0
-* ggplot2 3.3.5
-* RColorBrewer 1.1-3
+* RStudio (1.4.1717)
+* circlize (0.4.14)
+* ComplexHeatmap (2.10.0)
+* ggplot2 (3.3.5)
+* RColorBrewer (1.1-3)
 
+<hr> 
 
-#Instructions:
+### Instructions
 
-**updated_B_analysis.py**
+**RS_220906_BCell_analysis.py**
 _Generates UMAPs and random forest classifiers for B-cell data._
 
-Required files: 
+Required files:
 * Bcell_cyto_2group.csv
 * Bcell_cyto_data.csv
 
@@ -77,7 +85,9 @@ Steps:
         * UMAP input parameters such as n_neighbors, min_dist, etc. can be altered in lines 342 - 348.
         * Factor used to determine color-coding is set by legend_entries in line 355.
 
-**updated_nk_analysis.py**
+<hr>
+
+**RS_220906_NKCell_analysis.py**
 _Generates UMAPs and random forest classifiers for  NK cell data._
 
 Required files: 
@@ -109,7 +119,9 @@ Steps:
         * UMAP input parameters such as n_neighbors, min_dist, etc. can be altered in lines 336-342.
         * Factor used to determine color-coding is set by legend_entries in line 349.
 
-**updated_all_analysis.py**
+<hr>
+
+**RS_220906_AllCell_analysis.py**
 _Generates UMAPS and random forest classifiers for data from all three cell types (B-cells, NK cells, and T-cells)_
 
 Required files:
@@ -148,8 +160,7 @@ Steps:
         * Colors used in color-coding and other plotting parameters can be changed in lines 327 - 348.
     * Similar alterations can be done in Sections 9 - 13 by locating and changing the same sections of code. 
 
-
-
+<hr>
 
 **B_heatmap.R**
 _Generates a heatmap with hierarchical clustering of single-cell OMI data from CD69+ activated and CD69- control B-cells_
@@ -166,6 +177,7 @@ Steps:
    * Hierarchical clustering of single cells is determined based on OMI parameters using Ward's method.
 4. The heatmap dimensions may be altered and the figure saved as the desired file type by using RStudio's Export feature.
 
+<hr>
 
 **NK_heatmap.R**
 _Generates a heatmap with hierarchical clustering of single-cell OMI data from CD69+ activated and CD69- control NK cells_
@@ -181,6 +193,8 @@ Steps:
    * The mean of all CD69- control cells from all three cell types is used to calculate a Z-score for each single cell
    * Hierarchical clustering of single cells is determined based on OMI parameters using Ward's method.
 4. The heatmap dimensions may be altered and the figure saved as the desired file type by using RStudio's Export feature.
+
+<hr> 
 
 **allcell_hmap.R**
 _Generates a heatmap with hierarchical clustering of groups of CD69+ activated and CD69- control cells from all three cell types (B, T, NK) by donor_
