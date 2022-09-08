@@ -11,7 +11,9 @@
 * allcell_hmap.R
 
 <hr> 
-### Dataset list:
+
+### Datasets:
+
 * **NK data 2 groups.csv** - Single-cell OMI data for CD69+ activated and CD69- control NK cells.
 * **NK data all groups.csv** - Single-cell OMI data for NK cells in all four combinations of activation status (CD69-/CD69+) and culture condition (activated/control)
 * **NK_heatmap.csv** - Contents of NK data 2 groups.csv, but formatted for ease of use in R with the ComplexHeatmap package.
