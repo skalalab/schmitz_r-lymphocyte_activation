@@ -16,16 +16,16 @@
 
 * **NK data 2 groups.csv** - Single-cell OMI data for CD69+ activated and CD69- control NK cells.
 * **NK data all groups.csv** - Single-cell OMI data for NK cells in all four combinations of activation status (CD69-/CD69+) and culture condition (activated/control)
-* **NK_heatmap.csv** - Contents of NK data 2 groups.csv, but formatted for ease of use in R with the ComplexHeatmap package.
+* **NK_heatmap.csv** - Contents of _NK data 2 groups.csv_, but formatted for ease of use in R with the ComplexHeatmap package.
     * Activation: 0 = CD69- control, 1 = CD69+ activated
     * Donor: 4 = Donor D, 5 = Donor E, 6 = Donor F
 * **Bcell_cyto_2group.csv** - Single-cell OMI data for CD69+ activated and CD69- control B-cells.
 * **Bcell_cyto_data.csv** - Single-cell OMI data for B-cells in all four combinations of activation status (CD69-/CD69+) and culture condition (activated/control)
-* **B_heatmap.csv** - Contents of Bcell_cyto_2group.csv, but formatted for ease of use in R with the ComplexHeatmap package.
+* **B_heatmap.csv** - Contents of _Bcell_cyto_2group.csv_, but formatted for ease of use in R with the ComplexHeatmap package.
     * Activation: 0 = CD69- control, 1 = CD69+ activated
     * Donor: 1 = Donor A, 2 = Donor B, 3 = Donor C
 * **AllCellData.csv** - Single-cell OMI data for CD69+ activated and CD69- control cells from all three cell types (NK, B, T)
-* **AllCellData_hmap.csv** - Contents of AllCellData.csv, but formatted for ease of use in R with the ComplexHeatmap package.
+* **AllCellData_hmap.csv** - Contents of _AllCellData.csv_, but formatted for ease of use in R with the ComplexHeatmap package.
     * Activation: 0 = CD69- control, 1 = CD69+ activated
     * Cell Type: 0 = B-cells, 1 = NK cells, 2 = T-cells
     * Donor: 1-6 same as above, 7 = Donor G, 8 = Donor H, 9 = Donor I, 10 = Donor J, 11 = Donor K, 12 = Donor L
