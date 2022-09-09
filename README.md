@@ -3,12 +3,20 @@
 <hr>
 
 ### Contents:
-* RS_220906_BCell_analysis.py
-* RS_220906_NKCell_analysis.py
-* RS_220906_AllCell_analysis.py
-* b_heatmap.R
-* nk_heatmap.R
-* allcell_hmap.R
+Various software was used to perform the analysis and generate the figures in the paper.
+
+* Figures made in python
+  * RS_220906_BCell_analysis.py
+  * RS_220906_NKCell_analysis.py
+  * RS_220906_AllCell_analysis.py
+* Figures made in R 
+  * b_heatmap.R
+  * nk_heatmap.R
+  * allcell_hmap.R
+* Figures made in Prism
+  * NK graphs.pzfx
+  * B cell graphs.pzfx
+  * B cell graphs.pzfx
 
 <hr> 
 
