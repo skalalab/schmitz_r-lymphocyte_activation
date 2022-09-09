@@ -3,9 +3,9 @@
 <hr>
 
 ### Contents:
-* updated_b_analysis.py
-* updated_nk_analysis.py
-* updated_all_analysis.py
+* RS_220906_BCell_analysis.py
+* RS_220906_NKCell_analysis.py
+* RS_220906_AllCell_analysis.py
 * b_heatmap.R
 * nk_heatmap.R
 * allcell_hmap.R
