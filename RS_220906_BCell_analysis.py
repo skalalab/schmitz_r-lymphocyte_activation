@@ -547,7 +547,7 @@ reversefactor = dict(zip(range(5), definitions))
 y_test_rf = np.vectorize(reversefactor.get)(y_test)
 y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
 print("Random Forest")
-print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100)
+print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition']))
 # for col, feature in zip(np.flip(all_rf.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
 #     print(col, clf.feature_importances_[feature])
 
@@ -594,7 +594,7 @@ reversefactor = dict(zip(range(5), definitions))
 y_test_rf = np.vectorize(reversefactor.get)(y_test)
 y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
 print("Logistic Regression")
-print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100)
+print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition']))
 
 
 
@@ -655,7 +655,7 @@ reversefactor = dict(zip(range(5), definitions))
 y_test_rf = np.vectorize(reversefactor.get)(y_test)
 y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
 print("SVC")
-print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100)
+print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition']))
 
 # print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='index')*100)
 

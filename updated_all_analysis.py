@@ -65,7 +65,8 @@ def calculate_roc_rf(rf_df, key='Activation'):
 
 #Read in dataframe    
 
-all_df = pd.read_csv('Z:/0-Projects and Experiments/RS - lymphocyte activation/data/AllCellData.csv')
+# all_df = pd.read_csv('Z:/0-Projects and Experiments/RS - lymphocyte activation/data/AllCellData.csv')
+all_df = pd.read_csv('Data files/UMAPs, boxplots, ROC curves (Python)/AllCellData.csv')
 
 #Add combination variables to data set
 
@@ -124,6 +125,7 @@ print(classification_report(y_test,y_pred))
 
 #%% Section 5 - Cell Type Classifier
 
+#TODO
 
 print('All cell data cell type classifier')
 
@@ -135,7 +137,6 @@ list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FA
 #Make copy of main data frame, pull out OMI variables we want in classifier
 all_df_edit = all_df.copy()
 all_df_edit = all_df_edit[list_omi_parameters]
-
 
 from sklearn.preprocessing import StandardScaler
 
@@ -162,18 +163,23 @@ y_pred = clf.predict(X_test)
 reversefactor = dict(zip(range(len(classes)), definitions))
 y_test = np.vectorize(reversefactor.get)(y_test)
 y_pred = np.vectorize(reversefactor.get)(y_pred)
+print("S6 T B and NK cells")
 cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
+print(cm_table)
+cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'])
 print(cm_table)
 
 #List weights of each feature in classifier
-for col, feature in zip(np.flip(all_df_edit.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
-    print(col, clf.feature_importances_[feature])
+# for col, feature in zip(np.flip(all_df_edit.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
+#     print(col, clf.feature_importances_[feature])
 
 #Print metrics for classifier assessment
 print('Accuracy score =', accuracy_score(y_test, y_pred))
-print(classification_report(y_test,y_pred))
+# print(classification_report(y_test,y_pred))
 
 #%% Section 6 - Cell type classifer (QUIESCENT ONLY)
+
+#TODO
 
 #List of OMI variables we want to include in the classifier. No variable with classes is needed - that is extracted later
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
@@ -216,19 +222,26 @@ reversefactor = dict(zip(range(len(classes)), definitions))
 y_test = np.vectorize(reversefactor.get)(y_test)
 y_pred = np.vectorize(reversefactor.get)(y_pred)
 
+print("SF 7 Quiescent")
 cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
-
 print(cm_table)
-for col, feature in zip(np.flip(all_df_edit.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
-    print(col, clf.feature_importances_[feature])
+print("-"*20)
+cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'])
+print(cm_table)
+
+
+
+# for col, feature in zip(np.flip(all_df_edit.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
+#     print(col, clf.feature_importances_[feature])
 
 print('Accuracy score =', accuracy_score(y_test, y_pred))
-print(classification_report(y_test,y_pred))
+# print(classification_report(y_test,y_pred))
 
 
 
 #%% Section 7 - Cell type + activation classifier
 
+#TODO
 
 print('All cell data cell type + activation classifier')
 
@@ -271,14 +284,17 @@ reversefactor = dict(zip(range(len(classes)), definitions))
 y_test = np.vectorize(reversefactor.get)(y_test)
 y_pred = np.vectorize(reversefactor.get)(y_pred)
 
-cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
-
-print(cm_table)
-for col, feature in zip(np.flip(all_df_edit.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
-    print(col, clf.feature_importances_[feature])
+print("SF8")
+cm_table1 = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
+print(cm_table1)
+print("-" * 30)
+cm_table2 = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'])
+print(cm_table2)
+# for col, feature in zip(np.flip(all_df_edit.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
+#     print(col, clf.feature_importances_[feature])
 
 print('Accuracy score =', accuracy_score(y_test, y_pred))
-print(classification_report(y_test,y_pred))
+# print(classification_report(y_test,y_pred))
 
 
 
