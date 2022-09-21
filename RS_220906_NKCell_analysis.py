@@ -9,6 +9,8 @@ Created on Mon May  2 16:45:58 2022
 
 #%%  Section 1 
 
+from copy import deepcopy
+
 import umap.umap_ as umap
 import numpy as np 
 import pandas as pd
@@ -446,6 +448,8 @@ plt.savefig('./figures/RS_nk_na1.svg',dpi=350, bbox_inches='tight')
 
 #%% Section 5 - ROC curves: Random forest, Logistic Regression, SVM curves together
 
+
+# TODO
 sns.set(rc={'figure.figsize': (15, 15)})
 sns.set_style(style='white')
 plt.rcParams['svg.fonttype'] = 'none'
@@ -468,6 +472,27 @@ clf = RandomForestClassifier(random_state=0)
 y_score = clf.fit(X_train, y_train).predict_proba(X_test)
 y_pred = clf.fit(X_train, y_train).predict(X_test)
 
+
+############ ECG export train/testsplit
+
+dict_classes = {idx : c for idx, c in enumerate(classes) }
+
+# train/test split
+df_export_train = deepcopy(X_train)
+df_export_train['activation_label'] = y_train
+df_export_train['Activation'] = df_export_train['activation_label'].map(dict_classes)
+
+df_export_test = deepcopy(X_test)
+df_export_test['activation_label'] = y_test
+df_export_test['Activation'] = df_export_test['activation_label'].map(dict_classes)
+
+
+# add random_forest predictions
+df_export_test['prediction_random_forest'] = y_pred
+
+############
+
+
 # Compute ROC curve and ROC area for each class
 
 fpr, tpr, _ = roc_curve(y_test, y_score[:, 1])
@@ -483,15 +508,16 @@ definitions = factor[1]
 reversefactor = dict(zip(range(5), definitions))
 y_test_rf = np.vectorize(reversefactor.get)(y_test)
 y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
+print('Random Forest')
 print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100)
-for col, feature in zip(np.flip(all_rf.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
-    print(col, clf.feature_importances_[feature])
+# for col, feature in zip(np.flip(all_rf.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
+#     print(col, clf.feature_importances_[feature])
 
 
 
 #print metrics to assess classifier performance
 print('Accuracy score =', accuracy_score(y_test, y_pred))
-print(classification_report(y_test,y_pred))
+# print(classification_report(y_test,y_pred))
 
 
 all_rf = nk_df[['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix', 'Activation']]
@@ -510,6 +536,10 @@ clf = LogisticRegression(random_state=0) #JR - use for logistic regression
 y_score = clf.fit(X_train, y_train).predict_proba(X_test)
 y_pred = clf.fit(X_train, y_train).predict(X_test)
 
+############
+df_export_test['prediction_logistic_regression'] = y_pred
+############
+
 # Compute ROC curve and ROC area for each class
 
 
@@ -527,6 +557,7 @@ definitions = factor[1]
 reversefactor = dict(zip(range(5), definitions))
 y_test_rf = np.vectorize(reversefactor.get)(y_test)
 y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
+print('Logistic Regression')
 print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100)
 
 
@@ -534,7 +565,7 @@ print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'],
 
 #print metrics to assess classifier performance
 print('Accuracy score =', accuracy_score(y_test, y_pred))
-print(classification_report(y_test,y_pred))
+# print(classification_report(y_test,y_pred))
 
 
 
@@ -553,6 +584,10 @@ clf = SVC(probability=True) #JR - use for SVM
 
 y_score = clf.fit(X_train, y_train).predict_proba(X_test)
 y_pred = clf.fit(X_train, y_train).predict(X_test)
+
+############
+df_export_test['prediction_SVC'] = y_pred
+############
 
 # Compute ROC curve and ROC area for each class
 
@@ -584,6 +619,7 @@ definitions = factor[1]
 reversefactor = dict(zip(range(5), definitions))
 y_test_rf = np.vectorize(reversefactor.get)(y_test)
 y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
+print('SVC')
 print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100)
 
 
@@ -591,7 +627,13 @@ print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'],
 
 #print metrics to assess classifier performance
 print('Accuracy score =', accuracy_score(y_test, y_pred))
-print(classification_report(y_test,y_pred))
+# print(classification_report(y_test,y_pred))
+
+
+#### ECG 
+df_export_train.to_csv('./splits/SF4_NKcell_train_set_RF_LR_SVC.csv')
+df_export_test.to_csv('./splits/SF4_NKcell_train_set_RF_LR_SVC_and_predictions.csv')
+
 
 
 #%% Section 6 - NK cell activation UMAP
