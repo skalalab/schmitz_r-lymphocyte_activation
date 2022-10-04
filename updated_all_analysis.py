@@ -69,7 +69,6 @@ def calculate_roc_rf(rf_df, key='Activation'):
 all_df = pd.read_csv('Data files/UMAPs, boxplots, ROC curves (Python)/AllCellData.csv')
 
 #Add combination variables to data set
-
 all_df.drop(['NADH', 'Group', 'Experiment_Date'], axis=1, inplace=True)
 all_df['Type_Activation'] = all_df['Cell_Type'] + ': ' + all_df['Activation']
 all_df['Donor_Activation'] = all_df['Cell_Type'] +' '+ all_df['Donor'] + ': ' + all_df['Activation']
@@ -89,8 +88,9 @@ list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FA
 #Make copy of main data frame, pull out OMI variables we want in classifier
 all_df_edit = all_df.copy()
 all_df_edit = all_df_edit[list_omi_parameters]
-
 classes = ['CD69-', 'CD69+']
+
+
 
 #Split training/testing data, random forest classifier
 X, y = all_df_edit.iloc[:,:-1], all_df_edit[['Activation']]
@@ -107,7 +107,7 @@ definitions = factor[1]
 reversefactor = dict(zip(range(5), definitions))
 y_test_rf = np.vectorize(reversefactor.get)(y_test)
 y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
-print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100)
+print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition']))
 
 #Print features with weight in classifier
 for col, feature in zip(np.flip(all_df_edit.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
@@ -125,14 +125,23 @@ print(classification_report(y_test,y_pred))
 
 #%% Section 5 - Cell Type Classifier
 
-#TODO
 
 print('All cell data cell type classifier')
 
 
 #List of OMI variables we want in the classifier - do NOT have to list variable with classes ('Cell_Type'), just OMI variables
+#TODO SF6 -confusion matrix and pie chart 
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
 
+# Figure 5 E accuracies ==> 
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+# list_omi_parameters = ['NADH_tm']
+# list_omi_parameters = ['NADH_tm', 'FAD_t1']
+# list_omi_parameters = ['NADH_tm', 'FAD_t1', 'FAD_tm']
+# list_omi_parameters = ['NADH_tm', 'FAD_t1', 'FAD_tm', 'NADH_a1']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
+# list_omi_parameters = ['Norm_RR', 'Cell_Size_Pix']
+# list_omi_parameters = ['NADH_a1']
    
 #Make copy of main data frame, pull out OMI variables we want in classifier
 all_df_edit = all_df.copy()
@@ -155,7 +164,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.fit_transform(X_test)
-clf = RandomForestClassifier(random_state=0)
+clf = RandomForestClassifier(random_state=0, class_weight='balanced')
 clf.fit(X_train, y_train)
 y_pred = clf.predict(X_test)
 
@@ -164,8 +173,8 @@ reversefactor = dict(zip(range(len(classes)), definitions))
 y_test = np.vectorize(reversefactor.get)(y_test)
 y_pred = np.vectorize(reversefactor.get)(y_pred)
 print("S6 T B and NK cells")
-cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
-print(cm_table)
+# cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
+# print(cm_table)
 cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'])
 print(cm_table)
 
@@ -178,41 +187,43 @@ print('Accuracy score =', accuracy_score(y_test, y_pred))
 # print(classification_report(y_test,y_pred))
 
 #%% Section 6 - Cell type classifer (QUIESCENT ONLY)
+from sklearn.preprocessing import StandardScaler
 
-#TODO
+#TODO SF7 confusion matrix and pie chart
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
 
 #List of OMI variables we want to include in the classifier. No variable with classes is needed - that is extracted later
+# SF 7 accuracies
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_a1']
+list_omi_parameters = ['NADH_tm', 'NADH_a1']
+list_omi_parameters = ['NADH_tm', 'NADH_a1',   'FAD_t1']
+list_omi_parameters = ['NADH_tm', 'NADH_a1','FAD_tm', 'FAD_t1']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
+list_omi_parameters = ['Norm_RR', 'Cell_Size_Pix']
 
 #Create subset of dataset that only contains CD69- control cells 
-   
 all_df_qonly = all_df.loc[all_df['Activation']=='CD69-']
 all_df_edit = all_df_qonly[list_omi_parameters]
 
 print('All cell data cell type classifier - Quiescent cells only')
 
 #Same classifier code structure as Section 5 - see Section 5 comments for details
-
-from sklearn.preprocessing import StandardScaler
-
 classes = all_df_qonly.Cell_Type.unique()
-
 factor = pd.factorize(all_df_qonly.Cell_Type)
-
 all_df_qonly['CT_LABELS'] = factor[0]
-
 definitions = factor[1]
 
 X, y = all_df_edit, all_df_qonly['CT_LABELS'].values
 
+#####
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
-
 scaler = StandardScaler()
 
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.fit_transform(X_test)
 
-clf = RandomForestClassifier(random_state=0)
+clf = RandomForestClassifier(random_state=0, class_weight='balanced')
 
 clf.fit(X_train, y_train)
 
@@ -223,8 +234,8 @@ y_test = np.vectorize(reversefactor.get)(y_test)
 y_pred = np.vectorize(reversefactor.get)(y_pred)
 
 print("SF 7 Quiescent")
-cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
-print(cm_table)
+# cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
+# print(cm_table)
 print("-"*20)
 cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'])
 print(cm_table)
@@ -241,7 +252,7 @@ print('Accuracy score =', accuracy_score(y_test, y_pred))
 
 #%% Section 7 - Cell type + activation classifier
 
-#TODO
+#TODO SF8 C
 
 print('All cell data cell type + activation classifier')
 
@@ -250,10 +261,19 @@ print('All cell data cell type + activation classifier')
 
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
 
-   
+
+## Figure 5 F
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+# list_omi_parameters = ['NADH_a1']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1',  'Cell_Size_Pix']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1','NADH_t1', 'Cell_Size_Pix']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
+# list_omi_parameters = ['Norm_RR', 'Cell_Size_Pix']
+
+
 all_df_edit = all_df.copy()
 all_df_edit = all_df_edit[list_omi_parameters]
-
 
 from sklearn.preprocessing import StandardScaler
 
@@ -274,7 +294,7 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.fit_transform(X_test)
 
-clf = RandomForestClassifier(random_state=0)
+clf = RandomForestClassifier(random_state=0, class_weight='balanced')
 
 clf.fit(X_train, y_train)
 
@@ -285,8 +305,8 @@ y_test = np.vectorize(reversefactor.get)(y_test)
 y_pred = np.vectorize(reversefactor.get)(y_pred)
 
 print("SF8")
-cm_table1 = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
-print(cm_table1)
+# cm_table1 = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
+# print(cm_table1)
 print("-" * 30)
 cm_table2 = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'])
 print(cm_table2)
@@ -302,6 +322,7 @@ print('Accuracy score =', accuracy_score(y_test, y_pred))
 
 #list of parameters we want to use for the UMAP. I used ten OMI features (Normalized redox ratio, NAD(P)H lifetimes, FAD lifetimes, and cell size)
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+
 
 
 #generate UMAP

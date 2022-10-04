@@ -29,6 +29,7 @@ hv.extension("bokeh")
 from holoviews import opts
 
 from bokeh.io import export_svgs
+from pprint import pprint
 
 import pandas as pd
 import seaborn as sns
@@ -40,43 +41,44 @@ sns.set(rc={'figure.figsize': (15, 15)})
 sns.set_style(style='white')
 plt.rcParams['svg.fonttype'] = 'none'
 
+from helper import run_analysis_on_classifier, _train_test_split
 
 #%% Section 2 - Define ROC function
 
 
-def calculate_roc_rf(rf_df, key='Activation'): 
+# def calculate_roc_rf(rf_df, key='Activation'): 
     
-    # Need to binarize the problem as a 'One vs. all' style approach for ROC classification
-    classes = ['CD69-', 'CD69+']
+#     # Need to binarize the problem as a 'One vs. all' style approach for ROC classification
+#     classes = ['CD69-', 'CD69+']
 
-    #designate train/test data, random forest classifier
-    X, y = rf_df.iloc[:,:-1], rf_df[[key]]
-    y = label_binarize(y, classes=classes)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
-    y_train = np.ravel(y_train)
-    clf = RandomForestClassifier(random_state=0)
-    y_score = clf.fit(X_train, y_train).predict_proba(X_test)
-    y_pred = clf.fit(X_train, y_train).predict(X_test)
+#     #designate train/test data, random forest classifier
+#     X, y = rf_df.iloc[:,:-1], rf_df[[key]]
+#     y = label_binarize(y, classes=classes)
+#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
+#     y_train = np.ravel(y_train)
+#     clf = RandomForestClassifier(random_state=0)
+#     y_score = clf.fit(X_train, y_train).predict_proba(X_test)
+#     y_pred = clf.fit(X_train, y_train).predict(X_test)
 
 
-    # Compute ROC curve and ROC area for each class
+#     # Compute ROC curve and ROC area for each class
     
-    fpr, tpr, _ = roc_curve(y_test, y_score[:, 1])
-    roc_auc = auc(fpr, tpr)
+#     fpr, tpr, _ = roc_curve(y_test, y_score[:, 1])
+#     roc_auc = auc(fpr, tpr)
     
-    # Plot of a ROC curve for a specific class
-    plt.figure()
-    plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
-    plt.plot([0, 1], [0, 1], 'k--')
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.0])
-    plt.xlabel('False Positive Rate', fontsize = 20)
-    plt.ylabel('True Positive Rate', fontsize = 20)
-    plt.xticks(fontsize = 20)
-    plt.yticks(fontsize = 20)
-    plt.title('')
-    plt.legend(loc="lower right", fontsize = 20)
-    plt.show()
+#     # Plot of a ROC curve for a specific class
+#     plt.figure()
+#     plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
+#     plt.plot([0, 1], [0, 1], 'k--')
+#     plt.xlim([0.0, 1.0])
+#     plt.ylim([0.0, 1.0])
+#     plt.xlabel('False Positive Rate', fontsize = 20)
+#     plt.ylabel('True Positive Rate', fontsize = 20)
+#     plt.xticks(fontsize = 20)
+#     plt.yticks(fontsize = 20)
+#     plt.title('')
+#     plt.legend(loc="lower right", fontsize = 20)
+#     plt.show()
     
 #%% Section 3 - Read in and set up dataframe 
 
@@ -85,7 +87,6 @@ def calculate_roc_rf(rf_df, key='Activation'):
 all_df = pd.read_csv('./Data files/UMAPs, boxplots, ROC curves (Python)/AllCellData.csv')
 
 #Add combination variables to data set
-
 all_df.drop(['NADH', 'Group', 'Experiment_Date'], axis=1, inplace=True)
 all_df['Type_Activation'] = all_df['Cell_Type'] + ': ' + all_df['Activation']
 all_df['Donor_Activation'] = all_df['Cell_Type'] +' '+ all_df['Donor'] + ': ' + all_df['Activation']
@@ -93,8 +94,18 @@ all_df['Donor_CellType'] = all_df['Donor'] + ': ' + all_df['Cell_Type']
 
 df_data = all_df.copy()
 
+#%% # SF5
+classes = ['CD69-', 'CD69+']
+dict_classes = {label_int : label_class for label_int, label_class in enumerate(classes)}
+
+
 #%% Section 4 - All cell activation classifier ROCs - Plot all curves together 
 
+#TODO FIGURE 5
+
+# accuracies in SF5
+
+dict_accuracies = {}
 
 print('All cell activation classifier')
 
@@ -106,304 +117,102 @@ custom_color = sns.set_palette(sns.color_palette(colors))
 
 #Generate df with only the OMI variables we want to include in the classifier (***Always keep Activation column last)
 
+##%% ################## 10 features
 
-all_rf = all_df[['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix', 'Activation']]
+list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
 
-classes = ['CD69-', 'CD69+']
 
-#designate train/test data, random forest classifier
-X, y = all_rf.iloc[:,:-1], all_rf[['Activation']]
-y = label_binarize(y, classes=classes)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
-y_train = np.ravel(y_train)
-clf = RandomForestClassifier(random_state=0)
-y_score = clf.fit(X_train, y_train).predict_proba(X_test)
-y_pred = clf.fit(X_train, y_train).predict(X_test)
+X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
-# Compute ROC curve and ROC area for each class
-
-fpr, tpr, _ = roc_curve(y_test, y_score[:, 1])
-roc_auc = auc(fpr, tpr)
+clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
+fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+dict_accuracies['Top_10'] = accuracy
 
 # Plot of a ROC curve for a specific class
 plt.figure()
 plt.plot(fpr, tpr, label='All variables (ROC AUC = %0.2f)' % roc_auc, linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
-#generate and print confusion matrix and feature weights
-factor = pd.factorize(all_rf[['Activation']].squeeze())
-definitions = factor[1]
-reversefactor = dict(zip(range(5), definitions))
-y_test_rf = np.vectorize(reversefactor.get)(y_test)
-y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
-print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100)
-# for col, feature in zip(np.flip(all_rf.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
-#     print(col, clf.feature_importances_[feature])
+##%% ################## NADH variables + Cell Size
 
+list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
 
+X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
-#print metrics to assess classifier performance
-print('Accuracy score =', accuracy_score(y_test, y_pred))
-print(classification_report(y_test,y_pred))
-
-
-
-#NADH variables + Cell Size
-
-all_rf = all_df[['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix', 'Activation']]
-
-classes = ['CD69-', 'CD69+']
-
-#designate train/test data, random forest classifier
-X, y = all_rf.iloc[:,:-1], all_rf[['Activation']]
-y = label_binarize(y, classes=classes)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
-y_train = np.ravel(y_train)
-clf = RandomForestClassifier(random_state=0)
-y_score = clf.fit(X_train, y_train).predict_proba(X_test)
-y_pred = clf.fit(X_train, y_train).predict(X_test)
-
-# Compute ROC curve and ROC area for each class
-
-fpr, tpr, _ = roc_curve(y_test, y_score[:, 1])
-roc_auc = auc(fpr, tpr)
+clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
+fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+dict_accuracies['nadh_and_cell_size'] = accuracy
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label='NAD(P)H variables + Cell Size (ROC AUC = %0.2f)' % roc_auc, linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
+##%% ################## Top 4 (NADH a1, Norm RR, Cell Size, NADH t1)
 
-#generate and print confusion matrix and feature weights
-factor = pd.factorize(all_rf[['Activation']].squeeze())
-definitions = factor[1]
-reversefactor = dict(zip(range(5), definitions))
-y_test_rf = np.vectorize(reversefactor.get)(y_test)
-y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
-print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100)
-for col, feature in zip(np.flip(all_rf.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
-    print(col, clf.feature_importances_[feature])
+list_cols = ['Norm_RR', 'NADH_a1', 'Cell_Size_Pix',  'NADH_t1']
 
+X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
-#print metrics to assess classifier performance
-print('Accuracy score =', accuracy_score(y_test, y_pred))
-print(classification_report(y_test,y_pred))
-
-
-#Top 4 (NADH a1, Norm RR, Cell Size, NADH t1)
-
-
-all_rf = all_df[['Norm_RR', 'NADH_a1', 'Cell_Size_Pix',  'NADH_t1', 'Activation']]
-
-classes = ['CD69-', 'CD69+']
-
-#designate train/test data, random forest classifier
-X, y = all_rf.iloc[:,:-1], all_rf[['Activation']]
-y = label_binarize(y, classes=classes)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
-y_train = np.ravel(y_train)
-clf = RandomForestClassifier(random_state=0)
-y_score = clf.fit(X_train, y_train).predict_proba(X_test)
-y_pred = clf.fit(X_train, y_train).predict(X_test)
-
-# Compute ROC curve and ROC area for each class
-
-fpr, tpr, _ = roc_curve(y_test, y_score[:, 1])
-roc_auc = auc(fpr, tpr)
+clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
+fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+dict_accuracies['top_4'] = accuracy
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label='Top four variables (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
+##%% ################## Top 3 (NADH a1, Norm RR, Cell Size)
+list_cols = ['NADH_a1', 'Norm_RR', 'Cell_Size_Pix']
 
-#generate and print confusion matrix and feature weights
-factor = pd.factorize(all_rf[['Activation']].squeeze())
-definitions = factor[1]
-reversefactor = dict(zip(range(5), definitions))
-y_test_rf = np.vectorize(reversefactor.get)(y_test)
-y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
-print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100)
-for col, feature in zip(np.flip(all_rf.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
-    print(col, clf.feature_importances_[feature])
+X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
-
-#print metrics to assess classifier performance
-print('Accuracy score =', accuracy_score(y_test, y_pred))
-print(classification_report(y_test,y_pred))
-
-
-
-
-
-#Top 3 (NADH a1, Norm RR, Cell Size)
-
-
-all_rf = all_df[['NADH_a1', 'Norm_RR', 'Cell_Size_Pix', 'Activation']]
-
-classes = ['CD69-', 'CD69+']
-
-#designate train/test data, random forest classifier
-X, y = all_rf.iloc[:,:-1], all_rf[['Activation']]
-y = label_binarize(y, classes=classes)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
-y_train = np.ravel(y_train)
-clf = RandomForestClassifier(random_state=0)
-y_score = clf.fit(X_train, y_train).predict_proba(X_test)
-y_pred = clf.fit(X_train, y_train).predict(X_test)
-
-# Compute ROC curve and ROC area for each class
-
-fpr, tpr, _ = roc_curve(y_test, y_score[:, 1])
-roc_auc = auc(fpr, tpr)
+clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
+fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+dict_accuracies['top_3'] = accuracy
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label='Top three variables (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
+##%% ################## #Top 2 (NADH a1, Norm RR)
+list_cols = ['NADH_a1',  'Norm_RR']
 
-#generate and print confusion matrix and feature weights
-factor = pd.factorize(all_rf[['Activation']].squeeze())
-definitions = factor[1]
-reversefactor = dict(zip(range(5), definitions))
-y_test_rf = np.vectorize(reversefactor.get)(y_test)
-y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
-print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100)
-for col, feature in zip(np.flip(all_rf.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
-    print(col, clf.feature_importances_[feature])
+X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
-
-#print metrics to assess classifier performance
-print('Accuracy score =', accuracy_score(y_test, y_pred))
-print(classification_report(y_test,y_pred))
-
-
-
-
-
-#Top 2 (NADH a1, Norm RR)
-
-
-all_rf = all_df[['NADH_a1',  'Norm_RR', 'Activation']]
-
-classes = ['CD69-', 'CD69+']
-
-#designate train/test data, random forest classifier
-X, y = all_rf.iloc[:,:-1], all_rf[['Activation']]
-y = label_binarize(y, classes=classes)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
-y_train = np.ravel(y_train)
-clf = RandomForestClassifier(random_state=0)
-y_score = clf.fit(X_train, y_train).predict_proba(X_test)
-y_pred = clf.fit(X_train, y_train).predict(X_test)
-
-# Compute ROC curve and ROC area for each class
-
-fpr, tpr, _ = roc_curve(y_test, y_score[:, 1])
-roc_auc = auc(fpr, tpr)
+clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
+fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+dict_accuracies['top_2'] = accuracy
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label='Top two variables (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
+##%% ################## Redox + Cell Size
+list_cols = ['Cell_Size_Pix',  'Norm_RR']
 
-#generate and print confusion matrix and feature weights
-factor = pd.factorize(all_rf[['Activation']].squeeze())
-definitions = factor[1]
-reversefactor = dict(zip(range(5), definitions))
-y_test_rf = np.vectorize(reversefactor.get)(y_test)
-y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
-print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100)
-for col, feature in zip(np.flip(all_rf.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
-    print(col, clf.feature_importances_[feature])
+X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
-
-#print metrics to assess classifier performance
-print('Accuracy score =', accuracy_score(y_test, y_pred))
-print(classification_report(y_test,y_pred))
-
-
-
-
-
-
-
-
-#Redox + Cell Size
-
-
-all_rf = all_df[['Cell_Size_Pix',  'Norm_RR', 'Activation']]
-
-classes = ['CD69-', 'CD69+']
-
-#designate train/test data, random forest classifier
-X, y = all_rf.iloc[:,:-1], all_rf[['Activation']]
-y = label_binarize(y, classes=classes)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
-y_train = np.ravel(y_train)
-clf = RandomForestClassifier(random_state=0)
-y_score = clf.fit(X_train, y_train).predict_proba(X_test)
-y_pred = clf.fit(X_train, y_train).predict(X_test)
-
-# Compute ROC curve and ROC area for each class
-
-fpr, tpr, _ = roc_curve(y_test, y_score[:, 1])
-roc_auc = auc(fpr, tpr)
+clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
+fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+dict_accuracies['redox_cell_size'] = accuracy
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label='Norm. Redox Ratio + Cell Size (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 
-#generate and print confusion matrix and feature weights
-factor = pd.factorize(all_rf[['Activation']].squeeze())
-definitions = factor[1]
-reversefactor = dict(zip(range(5), definitions))
-y_test_rf = np.vectorize(reversefactor.get)(y_test)
-y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
-print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100)
-for col, feature in zip(np.flip(all_rf.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
-    print(col, clf.feature_importances_[feature])
+##%% ################## Top variable (NADH a1)
+list_cols = ['NADH_a1']
 
+X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
-#print metrics to assess classifier performance
-print('Accuracy score =', accuracy_score(y_test, y_pred))
-print(classification_report(y_test,y_pred))
-
-
-#Top variable (NADH a1)
-
-
-all_rf = all_df[['NADH_a1', 'Activation']]
-
-classes = ['CD69-', 'CD69+']
-
-#designate train/test data, random forest classifier
-X, y = all_rf.iloc[:,:-1], all_rf[['Activation']]
-y = label_binarize(y, classes=classes)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
-y_train = np.ravel(y_train)
-clf = RandomForestClassifier(random_state=0)
-y_score = clf.fit(X_train, y_train).predict_proba(X_test)
-y_pred = clf.fit(X_train, y_train).predict(X_test)
-
-# Compute ROC curve and ROC area for each class
-
-fpr, tpr, _ = roc_curve(y_test, y_score[:, 1])
-roc_auc = auc(fpr, tpr)
+clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
+fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+dict_accuracies['top_1'] = accuracy
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label='Top variable (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
-
-
-#generate and print confusion matrix and feature weights
-factor = pd.factorize(all_rf[['Activation']].squeeze())
-definitions = factor[1]
-reversefactor = dict(zip(range(5), definitions))
-y_test_rf = np.vectorize(reversefactor.get)(y_test)
-y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
-print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100)
-for col, feature in zip(np.flip(all_rf.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
-    print(col, clf.feature_importances_[feature])
-
-
-#print metrics to assess classifier performance
-print('Accuracy score =', accuracy_score(y_test, y_pred))
-print(classification_report(y_test,y_pred))
-
-
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 
 plt.xlim([0.0, 1.0])
@@ -412,17 +221,20 @@ plt.xlabel('False Positive Rate', fontsize = 36)
 plt.ylabel('True Positive Rate', fontsize = 36)
 plt.xticks(fontsize = 36)
 plt.yticks(fontsize = 36)
-plt.title('')
+plt.title('Figure 5. ALL Cells', fontsize = 36)
 plt.legend(bbox_to_anchor=(-0.1,-0.1), loc="upper left", fontsize = 36)
-plt.savefig('./figures/RS_allcell_ROC.svg',dpi=350, bbox_inches='tight')
+plt.savefig('./figures/Figure5_RS_allcell_ROC.svg',dpi=350, bbox_inches='tight')
 plt.show()
 
+print("SF5 Accuracies - Random Forest")
+pprint(dict_accuracies)
 
 #%% Section 5 - All cell activation classifier - Random forest, Logistic, SVM ROCs - Plot all curves together
 
-
 #TODO
 
+class_weight = None 
+# class_weight = 'balanced'
 
 sns.set(rc={'figure.figsize': (15, 15)})
 sns.set_style(style='white')
@@ -432,185 +244,47 @@ colors = ['#fde725', '#1f988b','#440154']
 
 custom_color = sns.set_palette(sns.color_palette(colors))
 
+list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
-all_rf = all_df[['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix', 'Activation']]
+clf = RandomForestClassifier(random_state=0, class_weight=class_weight).fit(X_train, y_train)
+fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
 
-classes = ['CD69-', 'CD69+']
-
-#designate train/test data, random forest classifier
-X, y = all_rf.iloc[:,:-1], all_rf[['Activation']]
-y = label_binarize(y, classes=classes)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
-y_train = np.ravel(y_train)
-clf = RandomForestClassifier(random_state=0)
-y_score = clf.fit(X_train, y_train).predict_proba(X_test)
-y_pred = clf.fit(X_train, y_train).predict(X_test)
-
-
-############ ECG export train/testsplit
-
-dict_classes = {idx : c for idx, c in enumerate(classes) }
-
-# train/test split
-df_export_train = deepcopy(X_train)
-df_export_train['activation_label'] = y_train
-df_export_train['Activation'] = df_export_train['activation_label'].map(dict_classes)
-
-df_export_test = deepcopy(X_test)
-df_export_test['activation_label'] = y_test
-df_export_test['Activation'] = df_export_test['activation_label'].map(dict_classes)
-
-
-# add random_forest predictions
-df_export_test['prediction_random_forest'] = y_pred
-
-############
-
-
-# Compute ROC curve and ROC area for each class
-
-fpr, tpr, _ = roc_curve(y_test, y_score[:, 1])
-roc_auc = auc(fpr, tpr)
 
 # Plot of a ROC curve for a specific class
 plt.figure()
 plt.plot(fpr, tpr, label='Random Forest (ROC AUC = %0.2f)' % roc_auc, linewidth = 7)
-
-#generate and print confusion matrix and feature weights
-factor = pd.factorize(all_rf[['Activation']].squeeze())
-definitions = factor[1]
-reversefactor = dict(zip(range(5), definitions))
-y_test_rf = np.vectorize(reversefactor.get)(y_test)
-y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
-print("Random Forest")
-print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition']))
-# for col, feature in zip(np.flip(all_rf.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
-#     print(col, clf.feature_importances_[feature])
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 
+clf = LogisticRegression(random_state=0, class_weight=class_weight).fit(X_train, y_train) #JR - use for logistic regression
+fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
 
-#print metrics to assess classifier performance
-print('Accuracy score =', accuracy_score(y_test, y_pred))
-# print(classification_report(y_test,y_pred))
-
-
-all_rf = all_df[['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix', 'Activation']]
-
-classes = ['CD69-', 'CD69+']
-
-#designate train/test data, random forest classifier
-X, y = all_rf.iloc[:,:-1], all_rf[['Activation']]
-y = label_binarize(y, classes=classes)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
-y_train = np.ravel(y_train)
-
-clf = LogisticRegression(random_state=0) #JR - use for logistic regression
-
-
-y_score = clf.fit(X_train, y_train).predict_proba(X_test)
-y_pred = clf.fit(X_train, y_train).predict(X_test)
-
-############
-df_export_test['prediction_logistic_regression'] = y_pred
-############
-
-# Compute ROC curve and ROC area for each class
-
-
-
-fpr, tpr, _ = roc_curve(y_test, y_score[:, 1])
-roc_auc = auc(fpr, tpr)
-
-# Plot of a ROC curve for a specific class
 
 plt.plot(fpr, tpr, label='Logistic Regression (ROC AUC = %0.2f)' % roc_auc, linewidth = 7)
-
-#generate and print confusion matrix and feature weights
-factor = pd.factorize(all_rf[['Activation']].squeeze())
-definitions = factor[1]
-reversefactor = dict(zip(range(5), definitions))
-y_test_rf = np.vectorize(reversefactor.get)(y_test)
-y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
-print("Logistic Regression")
-print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition']))
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 
+clf = SVC(probability=True, class_weight=class_weight) #JR - use for SVM # probability=True
+csf_fit = clf.fit(X_train, y_train)
+fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(csf_fit, X_test, y_test, dict_classes)
 
-
-#print metrics to assess classifier performance
-print('Accuracy score =', accuracy_score(y_test, y_pred))
-# print(classification_report(y_test,y_pred))
-
-
-
-all_rf = all_df[['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix', 'Activation']]
-
-classes = ['CD69-', 'CD69+']
-
-#designate train/test data, random forest classifier
-X, y = all_rf.iloc[:,:-1], all_rf[['Activation']]
-y = label_binarize(y, classes=classes)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
-y_train = np.ravel(y_train)
-
-clf = SVC(probability=True) #JR - use for SVM
-
-
-y_score = clf.fit(X_train, y_train).predict_proba(X_test)
-y_pred = clf.fit(X_train, y_train).predict(X_test)
-
-
-############
-df_export_test['prediction_SVC'] = y_pred
-############
-
-# Compute ROC curve and ROC area for each class
-
-
-
-fpr, tpr, _ = roc_curve(y_test, y_score[:, 1])
-roc_auc = auc(fpr, tpr)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 # Plot of a ROC curve for a specific class
 
-plt.plot(fpr, tpr, label='Support Vector Machine (ROC AUC = %0.2f)' % roc_auc, linewidth = 7)
+plt.plot(fpr, tpr, label='Support Vector Machine (ROC AUC = %0.2f)' % roc_auc, linewidth = 7, zorder=1)
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.0])
 plt.xlabel('False Positive Rate', fontsize = 36)
 plt.ylabel('True Positive Rate', fontsize = 36)
 plt.xticks(fontsize = 36)
 plt.yticks(fontsize = 36)
-plt.title('')
+plt.title(f'All Cells | | class_weight: {class_weight}', fontsize = 36)
 plt.legend(bbox_to_anchor=(-0.1,-0.1), loc="upper left", fontsize = 36)
-plt.savefig('./figures/RS_allcell_SVMLR_ROC.svg',dpi=350, bbox_inches='tight')
+plt.savefig('./figures/SF5_RS_allcell_SVMLR_ROC.svg',dpi=350, bbox_inches='tight')
 
 plt.show()
-
-
-
-
-
-#generate and print confusion matrix and feature weights
-factor = pd.factorize(all_rf[['Activation']].squeeze())
-definitions = factor[1]
-reversefactor = dict(zip(range(5), definitions))
-y_test_rf = np.vectorize(reversefactor.get)(y_test)
-y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
-print("SVC")
-print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition']))
-
-
-
-
-#print metrics to assess classifier performance
-print('Accuracy score =', accuracy_score(y_test, y_pred))
-# print(classification_report(y_test,y_pred))
-
-
-#### ECG 
-df_export_train.to_csv('./splits/SF5_ALLcell_train_set_RF_LR_SVC.csv')
-df_export_test.to_csv('./splits/SF5_ALLcell_train_set_RF_LR_SVC_and_predictions.csv')
-
 
 #%% Section 6 - UMAP of activation status
 
