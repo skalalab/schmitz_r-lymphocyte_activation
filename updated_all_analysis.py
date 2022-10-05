@@ -164,7 +164,7 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.fit_transform(X_test)
-clf = RandomForestClassifier(random_state=0, class_weight='balanced')
+clf = RandomForestClassifier(random_state=0, class_weight=None)
 clf.fit(X_train, y_train)
 y_pred = clf.predict(X_test)
 
@@ -190,17 +190,17 @@ print('Accuracy score =', accuracy_score(y_test, y_pred))
 from sklearn.preprocessing import StandardScaler
 
 #TODO SF7 confusion matrix and pie chart
-# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
 
 #List of OMI variables we want to include in the classifier. No variable with classes is needed - that is extracted later
 # SF 7 accuracies
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
-list_omi_parameters = ['NADH_a1']
-list_omi_parameters = ['NADH_tm', 'NADH_a1']
-list_omi_parameters = ['NADH_tm', 'NADH_a1',   'FAD_t1']
-list_omi_parameters = ['NADH_tm', 'NADH_a1','FAD_tm', 'FAD_t1']
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
-list_omi_parameters = ['Norm_RR', 'Cell_Size_Pix']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+# list_omi_parameters = ['NADH_a1']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1',   'FAD_t1']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1','FAD_tm', 'FAD_t1']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
+# list_omi_parameters = ['Norm_RR', 'Cell_Size_Pix']
 
 #Create subset of dataset that only contains CD69- control cells 
 all_df_qonly = all_df.loc[all_df['Activation']=='CD69-']
@@ -223,7 +223,7 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.fit_transform(X_test)
 
-clf = RandomForestClassifier(random_state=0, class_weight='balanced')
+clf = RandomForestClassifier(random_state=0, class_weight=None)
 
 clf.fit(X_train, y_train)
 
@@ -294,7 +294,7 @@ scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.fit_transform(X_test)
 
-clf = RandomForestClassifier(random_state=0, class_weight='balanced')
+clf = RandomForestClassifier(random_state=0, class_weight=None)
 
 clf.fit(X_train, y_train)
 
