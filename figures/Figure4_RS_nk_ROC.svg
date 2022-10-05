@@ -6,7 +6,7 @@
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2022-10-03T15:26:41.492301</dc:date>
+    <dc:date>2022-10-05T11:06:29.131934</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -196,7 +196,7 @@ L 706.795478 48.504967
 L 792.957243 48.504967 
 L 856.963125 38.968125 
 L 940.663125 38.968125 
-" clip-path="url(#p94c48b3b85)" style="fill: none; stroke: #fde725; stroke-width: 5; stroke-linecap: round"/>
+" clip-path="url(#p6035116982)" style="fill: none; stroke: #fde725; stroke-width: 5; stroke-linecap: round"/>
    </g>
    <g id="line2d_2">
     <path d="M 103.663125 854.368125 
@@ -286,7 +286,7 @@ L 677.254301 43.736546
 L 738.798419 38.968125 
 L 807.727831 38.968125 
 L 940.663125 38.968125 
-" clip-path="url(#p94c48b3b85)" style="fill: none; stroke: #a5db36; stroke-width: 5; stroke-linecap: round"/>
+" clip-path="url(#p6035116982)" style="fill: none; stroke: #a5db36; stroke-width: 5; stroke-linecap: round"/>
    </g>
    <g id="line2d_3">
     <path d="M 103.663125 854.368125 
@@ -380,7 +380,7 @@ L 647.713125 77.115493
 L 714.180772 62.81023 
 L 775.72489 53.273388 
 L 940.663125 38.968125 
-" clip-path="url(#p94c48b3b85)" style="fill: none; stroke: #4ac16d; stroke-width: 5; stroke-linecap: round"/>
+" clip-path="url(#p6035116982)" style="fill: none; stroke: #4ac16d; stroke-width: 5; stroke-linecap: round"/>
    </g>
    <g id="line2d_4">
     <path d="M 103.663125 854.368125 
@@ -472,7 +472,7 @@ L 716.642537 53.273388
 L 775.72489 53.273388 
 L 864.348419 38.968125 
 L 940.663125 38.968125 
-" clip-path="url(#p94c48b3b85)" style="fill: none; stroke: #1f988b; stroke-width: 5; stroke-linecap: round"/>
+" clip-path="url(#p6035116982)" style="fill: none; stroke: #1f988b; stroke-width: 5; stroke-linecap: round"/>
    </g>
    <g id="line2d_5">
     <path d="M 103.663125 854.368125 
@@ -569,7 +569,7 @@ L 610.786654 100.957599
 L 645.25136 86.652336 
 L 758.492537 67.578651 
 L 940.663125 38.968125 
-" clip-path="url(#p94c48b3b85)" style="fill: none; stroke: #2a788e; stroke-width: 5; stroke-linecap: round"/>
+" clip-path="url(#p6035116982)" style="fill: none; stroke: #2a788e; stroke-width: 5; stroke-linecap: round"/>
    </g>
    <g id="line2d_6">
     <path d="M 103.663125 854.368125 
@@ -644,7 +644,7 @@ L 460.619007 191.557599
 L 487.698419 182.020757 
 L 536.933713 167.715493 
 L 940.663125 38.968125 
-" clip-path="url(#p94c48b3b85)" style="fill: none; stroke: #414487; stroke-width: 5; stroke-linecap: round"/>
+" clip-path="url(#p6035116982)" style="fill: none; stroke: #414487; stroke-width: 5; stroke-linecap: round"/>
    </g>
    <g id="line2d_7">
     <path d="M 103.663125 854.368125 
@@ -729,7 +729,7 @@ L 820.036654 96.189178
 L 849.577831 72.347072 
 L 911.121949 62.81023 
 L 940.663125 38.968125 
-" clip-path="url(#p94c48b3b85)" style="fill: none; stroke: #440154; stroke-width: 5; stroke-linecap: round"/>
+" clip-path="url(#p6035116982)" style="fill: none; stroke: #440154; stroke-width: 5; stroke-linecap: round"/>
    </g>
    <g id="patch_3">
     <path d="M 103.663125 854.368125 
@@ -775,7 +775,7 @@ L 124.363125 981.9375
 " style="fill: none; stroke: #fde725; stroke-width: 5; stroke-linecap: round"/>
     </g>
     <g id="text_16">
-     <text style="fill: #262626; font: 36px 'sans-serif'; text-anchor: start" x="153.163125" y="994.5375" transform="rotate(-0 153.163125 994.5375)">All variables (ROC AUC = 0.84)</text>
+     <text style="fill: #262626; font: 36px 'sans-serif'; text-anchor: start" x="153.163125" y="994.5375" transform="rotate(-0 153.163125 994.5375)">All variables (ROC AUC = 0.91)</text>
     </g>
     <g id="line2d_9">
      <path d="M 52.363125 1033.74375 
@@ -784,7 +784,7 @@ L 124.363125 1033.74375
 " style="fill: none; stroke: #a5db36; stroke-width: 5; stroke-linecap: round"/>
     </g>
     <g id="text_17">
-     <text style="fill: #262626; font: 36px 'sans-serif'; text-anchor: start" x="153.163125" y="1046.34375" transform="rotate(-0 153.163125 1046.34375)">NAD(P)H variables + Cell Size (ROC AUC = 0.81)</text>
+     <text style="fill: #262626; font: 36px 'sans-serif'; text-anchor: start" x="153.163125" y="1046.34375" transform="rotate(-0 153.163125 1046.34375)">NAD(P)H variables + Cell Size (ROC AUC = 0.88)</text>
     </g>
     <g id="line2d_10">
      <path d="M 52.363125 1085.55 
@@ -793,7 +793,7 @@ L 124.363125 1085.55
 " style="fill: none; stroke: #4ac16d; stroke-width: 5; stroke-linecap: round"/>
     </g>
     <g id="text_18">
-     <text style="fill: #262626; font: 36px 'sans-serif'; text-anchor: start" x="153.163125" y="1098.15" transform="rotate(-0 153.163125 1098.15)">Top four variables (ROC AUC) = 0.83)</text>
+     <text style="fill: #262626; font: 36px 'sans-serif'; text-anchor: start" x="153.163125" y="1098.15" transform="rotate(-0 153.163125 1098.15)">Top four variables (ROC AUC) = 0.86)</text>
     </g>
     <g id="line2d_11">
      <path d="M 52.363125 1137.35625 
@@ -802,7 +802,7 @@ L 124.363125 1137.35625
 " style="fill: none; stroke: #1f988b; stroke-width: 5; stroke-linecap: round"/>
     </g>
     <g id="text_19">
-     <text style="fill: #262626; font: 36px 'sans-serif'; text-anchor: start" x="153.163125" y="1149.95625" transform="rotate(-0 153.163125 1149.95625)">Top three variables (ROC AUC) = 0.83)</text>
+     <text style="fill: #262626; font: 36px 'sans-serif'; text-anchor: start" x="153.163125" y="1149.95625" transform="rotate(-0 153.163125 1149.95625)">Top three variables (ROC AUC) = 0.86)</text>
     </g>
     <g id="line2d_12">
      <path d="M 52.363125 1189.1625 
@@ -811,7 +811,7 @@ L 124.363125 1189.1625
 " style="fill: none; stroke: #2a788e; stroke-width: 5; stroke-linecap: round"/>
     </g>
     <g id="text_20">
-     <text style="fill: #262626; font: 36px 'sans-serif'; text-anchor: start" x="153.163125" y="1201.7625" transform="rotate(-0 153.163125 1201.7625)">Top two variables (ROC AUC) = 0.79)</text>
+     <text style="fill: #262626; font: 36px 'sans-serif'; text-anchor: start" x="153.163125" y="1201.7625" transform="rotate(-0 153.163125 1201.7625)">Top two variables (ROC AUC) = 0.82)</text>
     </g>
     <g id="line2d_13">
      <path d="M 52.363125 1240.96875 
@@ -820,7 +820,7 @@ L 124.363125 1240.96875
 " style="fill: none; stroke: #414487; stroke-width: 5; stroke-linecap: round"/>
     </g>
     <g id="text_21">
-     <text style="fill: #262626; font: 36px 'sans-serif'; text-anchor: start" x="153.163125" y="1253.56875" transform="rotate(-0 153.163125 1253.56875)">Top variable (ROC AUC) = 0.72)</text>
+     <text style="fill: #262626; font: 36px 'sans-serif'; text-anchor: start" x="153.163125" y="1253.56875" transform="rotate(-0 153.163125 1253.56875)">Top variable (ROC AUC) = 0.78)</text>
     </g>
     <g id="line2d_14">
      <path d="M 52.363125 1292.775 
@@ -829,13 +829,13 @@ L 124.363125 1292.775
 " style="fill: none; stroke: #440154; stroke-width: 5; stroke-linecap: round"/>
     </g>
     <g id="text_22">
-     <text style="fill: #262626; font: 36px 'sans-serif'; text-anchor: start" x="153.163125" y="1305.375" transform="rotate(-0 153.163125 1305.375)">Norm. Redox Ratio + Cell Size (ROC AUC) = 0.69)</text>
+     <text style="fill: #262626; font: 36px 'sans-serif'; text-anchor: start" x="153.163125" y="1305.375" transform="rotate(-0 153.163125 1305.375)">Norm. Redox Ratio + Cell Size (ROC AUC) = 0.68)</text>
     </g>
    </g>
   </g>
  </g>
  <defs>
-  <clipPath id="p94c48b3b85">
+  <clipPath id="p6035116982">
    <rect x="103.663125" y="38.968125" width="837" height="815.4"/>
   </clipPath>
  </defs>

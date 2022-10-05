@@ -65,12 +65,13 @@ custom_color = sns.set_palette(sns.color_palette(colors))
 
 
 list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
-X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
+X_train1, X_test1, y_train1, y_test1 = _train_test_split(nk_df, list_cols, classes)
 
 ##%%  ################### 10 features 
-clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
-fpr, tpr, accuracy, roc_auc, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+clf = RandomForestClassifier(random_state=0).fit(X_train1, y_train1)
+fpr, tpr, roc_auc, accuracy, op_point = run_analysis_on_classifier(clf, X_test1, y_test1, dict_classes)
 
+## %%
 # Plot of a ROC curve for a specific class
 plt.figure()
 plt.plot(fpr, tpr, label=f'All variables (ROC AUC = {roc_auc:0.2f})' , linewidth = 5)
@@ -80,7 +81,7 @@ list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
 
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
-fpr, tpr, accuracy, roc_auc, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'NAD(P)H variables + Cell Size (ROC AUC = {roc_auc:0.2f})'  , linewidth = 5)
@@ -90,7 +91,7 @@ list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t2',  'Norm_RR']
 
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
-fpr, tpr, accuracy, roc_auc, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'Top four variables (ROC AUC) = {roc_auc:0.2f})' , linewidth = 5)
@@ -101,7 +102,7 @@ list_cols = ['NADH_tm', 'NADH_a1',  'Norm_RR']
 
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
-fpr, tpr, accuracy, roc_auc, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'Top three variables (ROC AUC) = {roc_auc:0.2f})' , linewidth = 5)
@@ -110,7 +111,7 @@ plt.plot(fpr, tpr, label=f'Top three variables (ROC AUC) = {roc_auc:0.2f})' , li
 list_cols = ['NADH_a1',  'Norm_RR']
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
-fpr, tpr, accuracy, roc_auc, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+fpr, tpr, roc_auc, accuracy,  op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'Top two variables (ROC AUC) = {roc_auc:0.2f})', linewidth = 5)
@@ -119,7 +120,7 @@ plt.plot(fpr, tpr, label=f'Top two variables (ROC AUC) = {roc_auc:0.2f})', linew
 list_cols = ['NADH_a1']
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
-fpr, tpr, accuracy, roc_auc, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+fpr, tpr, roc_auc, accuracy,  op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'Top variable (ROC AUC) = {roc_auc:0.2})', linewidth = 5)
@@ -129,7 +130,7 @@ plt.plot(fpr, tpr, label=f'Top variable (ROC AUC) = {roc_auc:0.2})', linewidth =
 list_cols = ['Cell_Size_Pix',  'Norm_RR']
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
-fpr, tpr, accuracy, roc_auc, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+fpr, tpr, roc_auc, accuracy,  op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'Norm. Redox Ratio + Cell Size (ROC AUC) = {roc_auc:0.2f})'  , linewidth = 5)
@@ -145,7 +146,6 @@ plt.legend(bbox_to_anchor=(-0.1,-0.1), loc="upper left", fontsize = 36)
 plt.savefig('./figures/Figure4_RS_nk_ROC.svg',dpi=350, bbox_inches='tight')
 
 plt.show()
-
 
 #%% Section 4 - donor color coding boxplots: Red/blue, all dots visible
 
