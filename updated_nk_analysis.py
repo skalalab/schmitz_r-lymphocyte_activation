@@ -61,7 +61,7 @@ def calculate_roc_rf(rf_df, key='Activation'):
     
 #%% Section 3
 
-nk_df = pd.read_csv('Z:/0-Projects and Experiments/RS - lymphocyte activation/data/NK cells (Donors 4-6)/NK data 2 groups.csv')
+nk_df = pd.read_csv('./Data files/UMAPs, boxplots, ROC curves (Python)/NK data 2 groups.csv')
 nk_df.drop(['NADH', 'Group', 'Experiment_Date'], axis=1, inplace=True)
 
 df_data = nk_df.copy()
@@ -319,7 +319,7 @@ hv.save(overlay, 'nk_hv_da_umap.html')
 
 #Read in CSV that has data from all 4 combinations of activation/culture condition
 
-allgroup_nk_df = pd.read_csv('Z:/0-Projects and Experiments/RS - lymphocyte activation/data/NK cells (Donors 4-6)/NK data all groups.csv')
+allgroup_nk_df = pd.read_csv('./Data files/UMAPs, boxplots, ROC curves (Python)//NK data all groups.csv')
 
 df_data = allgroup_nk_df.copy()
 

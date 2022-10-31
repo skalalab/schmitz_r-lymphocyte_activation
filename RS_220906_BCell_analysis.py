@@ -110,6 +110,7 @@ dict_accuracies['Top_10'] = accuracy
 # Plot of a ROC curve for a specific class
 plt.figure()
 plt.plot(fpr, tpr, label='All variables (ROC AUC = %0.2f)' % roc_auc, linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## NADH variables + Cell Size
 list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
@@ -120,6 +121,7 @@ dict_accuracies['nadh_and_cell_size'] = accuracy
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label='NAD(P)H variables + Cell Size (ROC AUC = %0.2f)' % roc_auc, linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## Top 4 (NADH a1, NADH tm, FAD t2, NADH t1)
 
@@ -131,6 +133,7 @@ dict_accuracies['top_4'] = accuracy
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label='Top four variables (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## Top 3 (NADH a1, NADH tm, FAD t2)
 
@@ -143,6 +146,7 @@ dict_accuracies['top_3'] = accuracy
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label='Top three variables (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## Top 2 (NADH a1, NADH tm)
 list_cols = ['NADH_a1',  'NADH_tm']
@@ -154,6 +158,7 @@ dict_accuracies['top_2'] = accuracy
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label='Top two variables (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## Top variable (NADH a1)
 
@@ -166,6 +171,7 @@ dict_accuracies['top_1'] = accuracy
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label='Top variable (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## Redox + Cell Size
 
@@ -179,6 +185,7 @@ dict_accuracies['redox_cell_size'] = accuracy
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label='Norm. Redox Ratio + Cell Size (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.0])
@@ -605,4 +612,6 @@ plot.output_backend = "svg"
 export_svgs(plot, filename = './figures/BCell_ActStatus_Condition_umap.svg')
 
 # hv.save(overlay, 'BCell_ActStatus_Condition_umap.html')
+
+#%%
 

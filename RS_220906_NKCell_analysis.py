@@ -63,7 +63,6 @@ dict_classes = {label_int : label_class for label_int, label_class in enumerate(
 colors = ['#fde725', '#a5db36', '#4ac16d','#1f988b','#2a788e','#414487', '#440154']
 custom_color = sns.set_palette(sns.color_palette(colors))
 
-
 list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
 X_train1, X_test1, y_train1, y_test1 = _train_test_split(nk_df, list_cols, classes)
 
@@ -75,6 +74,7 @@ fpr, tpr, roc_auc, accuracy, op_point = run_analysis_on_classifier(clf, X_test1,
 # Plot of a ROC curve for a specific class
 plt.figure()
 plt.plot(fpr, tpr, label=f'All variables (ROC AUC = {roc_auc:0.2f})' , linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ###################NADH variables + Cell Size
 list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
@@ -85,6 +85,7 @@ fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test,
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'NAD(P)H variables + Cell Size (ROC AUC = {roc_auc:0.2f})'  , linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################### Top 4 (NADH a1, Norm RR, NADH tm, NADH t2)
 list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t2',  'Norm_RR']
@@ -95,6 +96,7 @@ fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test,
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'Top four variables (ROC AUC) = {roc_auc:0.2f})' , linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################### Top 3 (NADH a1, Norm RR, NADH tm)
 
@@ -106,6 +108,7 @@ fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test,
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'Top three variables (ROC AUC) = {roc_auc:0.2f})' , linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################### Top 2 (NADH a1, Norm RR)
 list_cols = ['NADH_a1',  'Norm_RR']
@@ -115,6 +118,7 @@ fpr, tpr, roc_auc, accuracy,  op_point  = run_analysis_on_classifier(clf, X_test
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'Top two variables (ROC AUC) = {roc_auc:0.2f})', linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################### Top variable (NADH a1)
 list_cols = ['NADH_a1']
@@ -124,6 +128,7 @@ fpr, tpr, roc_auc, accuracy,  op_point  = run_analysis_on_classifier(clf, X_test
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'Top variable (ROC AUC) = {roc_auc:0.2})', linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################### Redox + Cell Size
 
@@ -134,6 +139,7 @@ fpr, tpr, roc_auc, accuracy,  op_point  = run_analysis_on_classifier(clf, X_test
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'Norm. Redox Ratio + Cell Size (ROC AUC) = {roc_auc:0.2f})'  , linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.0])
@@ -359,7 +365,12 @@ export_svgs(plot, filename = './figures/NKCell_ActStatus_umap.svg')
 
 #Same structure as Section 6 - see comments above
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+
+##
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', ]
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2']
+
 
 data = df_data[list_omi_parameters].values
 scaled_data = StandardScaler().fit_transform(data)
@@ -418,7 +429,7 @@ overlay.opts(
 plot = hv.render(overlay)
 plot.output_backend = "svg"
 export_svgs(plot, filename = './figures/NKCell_Donor_umap.svg')
-# hv.save(overlay, 'NKCell_Donor_umap.html')
+hv.save(overlay, 'NKCell_Donor_umap.html')
 
 
 #%% Section 8 - Nk cell donor + activation UMAP
@@ -429,7 +440,8 @@ df_data['Donor_Activation'] = df_data['Donor'] + ': ' + df_data['Activation']
 
 #Same structure as Section 6 - see comments above
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2']
 
 data = df_data[list_omi_parameters].values
 scaled_data = StandardScaler().fit_transform(data)
