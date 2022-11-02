@@ -2,6 +2,9 @@
 
 ```{r}
 rm(list=ls())
+#install.packages("tiff")
+#install.packages("tcltk")
+#install.packages("plyr")
 library(tiff)
 library(tcltk)
 library(plyr)
@@ -143,6 +146,7 @@ close(pb)
 
 setwd(file_dir)
 
+#write.csv(subout,"output_Activated.csv")
 write.csv(subout,"output_Activated.csv")
 
 
