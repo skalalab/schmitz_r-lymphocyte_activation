@@ -19,6 +19,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 
+from pprint import pprint
+
 from sklearn.metrics import roc_curve, auc, confusion_matrix, accuracy_score, classification_report
 from sklearn.ensemble import RandomForestClassifier
 
@@ -62,6 +64,10 @@ nk_df = nk_df.rename(columns={'n.t1.mean' : 'NADH_t1',
                               })
 
 
+print(nk_df.groupby(by=['Donor','Group','Activation']).count())
+
+print(nk_df.groupby(by=['Group','Activation'])['Cell_Size_Pix'].mean())
+
 nk_df.drop(['NADH', 'Group', 'Experiment_Date'], axis=1, inplace=True)
 
 nk_df['Act_Donor'] = nk_df['Activation'] + ' ' + nk_df['Donor']
@@ -71,9 +77,12 @@ df_data = nk_df.copy()
 # class labels and dict for mapping
 classes = ['CD69-', 'CD69+']
 dict_classes = {label_int : label_class for label_int, label_class in enumerate(classes)}
+
+
 #%% Section 3 - Generate graph with all ROCs
 
 #TODO F4
+list_top_vars = []
 
 # plot colors 
 colors = ['#fde725', '#a5db36', '#4ac16d','#1f988b','#2a788e','#414487', '#440154']
@@ -88,13 +97,8 @@ fpr, tpr, roc_auc, accuracy, op_point = run_analysis_on_classifier(clf, X_test1,
 
 ### Figure 4 C
 print("Figure 4C piechart of importance on all features")
-forest_importances = pd.Series(clf.feature_importances_*100, index=list_cols).sort_values(ascending=False)
+forest_importances = pd.Series(clf.feature_importances_*100, index=X_train1.keys()).sort_values(ascending=False)
 print(forest_importances)
-
-
-# for col, feature in zip(np.flip(nk_df.columns[np.argsort(clf.feature_importances_)]), 
-#                         np.flip(np.argsort(clf.feature_importances_))):
-#     print(col, clf.feature_importances_[feature])
 
 ## %%
 # Plot of a ROC curve for a specific class
@@ -114,7 +118,10 @@ plt.plot(fpr, tpr, label=f'NAD(P)H variables + Cell Size (ROC AUC = {roc_auc:0.2
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################### Top 4 (NADH a1, Norm RR, NADH tm, NADH t2)
-list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t2',  'Norm_RR']
+# list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t2',  'Norm_RR']
+
+list_cols = list(forest_importances.keys()[:4])
+list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
 
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
@@ -126,7 +133,10 @@ plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################### Top 3 (NADH a1, Norm RR, NADH tm)
 
-list_cols = ['NADH_tm', 'NADH_a1',  'Norm_RR']
+# list_cols = ['NADH_tm', 'NADH_a1',  'Norm_RR']
+list_cols = list(forest_importances.keys()[:3])
+list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
+
 
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
@@ -137,7 +147,12 @@ plt.plot(fpr, tpr, label=f'Top three variables (ROC AUC) = {roc_auc:0.2f})' , li
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################### Top 2 (NADH a1, Norm RR)
-list_cols = ['NADH_a1',  'Norm_RR']
+# list_cols = ['NADH_a1',  'Norm_RR']
+
+list_cols = list(forest_importances.keys()[:2])
+list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
+
+
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy,  op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
@@ -147,7 +162,11 @@ plt.plot(fpr, tpr, label=f'Top two variables (ROC AUC) = {roc_auc:0.2f})', linew
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################### Top variable (NADH a1)
-list_cols = ['NADH_a1']
+# list_cols = ['NADH_a1']
+list_cols = list(forest_importances.keys()[:1])
+list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
+
+
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy,  op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
@@ -178,6 +197,9 @@ plt.legend(bbox_to_anchor=(-0.1,-0.1), loc="upper left", fontsize = 36)
 plt.savefig('./figures/nk/F4_D_RS_nk_ROC.svg',dpi=350, bbox_inches='tight')
 
 plt.show()
+
+pprint(list_top_vars)
+
 
 #%% Section 4 - donor color coding boxplots: Red/blue, all dots visible
 
@@ -545,7 +567,7 @@ overlay.opts(
 plot = hv.render(overlay)
 plot.output_backend = "svg"
 export_svgs(plot, filename = './figures/nk/SF4_B_NKCell_Donor_ActStatus_umap.svg')
-# hv.save(overlay, 'NKCell_Donor_ActStatus_umap.html')
+# hv.save(overlay, './figures/nk/SF4_B_NKCell_Donor_ActStatus_umap.html')
 
 #%% Section 9 - UMAP of both groups and activation statuses of NK cells
 
@@ -558,6 +580,9 @@ export_svgs(plot, filename = './figures/nk/SF4_B_NKCell_Donor_ActStatus_umap.svg
 # allgroup_nk_df = pd.read_csv('./Data files/UMAPs, boxplots, ROC curves (Python)/NK data donors.csv')
 
 allgroup_nk_df = pd.read_csv(path_nk_data)
+
+
+# df['Group'] = df['Group'].replace("Control", "Unstimulated")
 
 
 allgroup_nk_df = allgroup_nk_df.rename(columns={'n.t1.mean' : 'NADH_t1', 
@@ -641,8 +666,8 @@ plot = hv.render(overlay)
 plot.output_backend = "svg"
 export_svgs(plot, filename = './figures/nk/SF4_A_NKCell_ActStatus_Condition_umap.svg')
 
-# hv.save(overlay, './figures/NKCell_ActStatus_Condition_umap.html')
-
+# hv.save(overlay, './figures/nk/SF4_A_NKCell_ActStatus_Condition_umap.html')
+ 
 
 
 

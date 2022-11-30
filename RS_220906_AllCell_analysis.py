@@ -30,6 +30,7 @@ from holoviews import opts
 
 from bokeh.io import export_svgs
 from pprint import pprint
+from pprint import pprint
 
 import pandas as pd
 import seaborn as sns
@@ -125,10 +126,17 @@ classes = ['CD69-', 'CD69+']
 dict_classes = {label_int : label_class for label_int, label_class in enumerate(classes)}
 
 
+print(all_df.groupby(by=['Cell_Type','Donor','Activation',])['Cell_Size_Pix'].count())
+
+print("*" * 20)
+
+print(all_df.groupby(by=['Cell_Type','Donor','Activation'])['Cell_Size_Pix'].mean())
+
+
+
 #%% Section 4 - All cell activation classifier ROCs - Plot all curves together 
 
 #TODO FIGURE 5 D
-
 
 print('All cell activation classifier')
 
@@ -140,16 +148,20 @@ custom_color = sns.set_palette(sns.color_palette(colors))
 
 #Generate df with only the OMI variables we want to include in the classifier (***Always keep Activation column last)
 
+list_top_vars = []
 ##%% ################## 10 features
 
 list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
-
 
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
-# dict_accuracies['Top_10'] = accuracy
+
+print("Figure 5D piechart of importance on all features")
+forest_importances = pd.Series(clf.feature_importances_*100, index=X_train.keys()).sort_values(ascending=False)
+print(forest_importances)
+
 
 # Plot of a ROC curve for a specific class
 plt.figure()
@@ -170,9 +182,12 @@ fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test,
 plt.plot(fpr, tpr, label='NAD(P)H variables + Cell Size (ROC AUC = %0.2f)' % roc_auc, linewidth = 5)
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
-##%% ################## Top 4 (NADH a1, Norm RR, Cell Size, NADH t1)
+##%% ################## Top 4 (NADH a1, Norm RR, Cell Size, NADH t1) ####################################### 4
 
-list_cols = ['Norm_RR', 'NADH_a1', 'Cell_Size_Pix',  'NADH_t1']
+# list_cols = ['Norm_RR', 'NADH_a1', 'Cell_Size_Pix',  'NADH_t1']
+list_cols = list(forest_importances.keys()[:4])
+list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
+
 
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
@@ -184,8 +199,10 @@ fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test,
 plt.plot(fpr, tpr, label='Top four variables (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
-##%% ################## Top 3 (NADH a1, Norm RR, Cell Size)
-list_cols = ['NADH_a1', 'Norm_RR', 'Cell_Size_Pix']
+##%% ################## Top 3 (NADH a1, Norm RR, Cell Size) ####################################### 3
+# list_cols = ['NADH_a1', 'Norm_RR', 'Cell_Size_Pix']
+list_cols = list(forest_importances.keys()[:3])
+list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
 
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
@@ -197,8 +214,10 @@ fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test,
 plt.plot(fpr, tpr, label='Top three variables (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
-##%% ################## #Top 2 (NADH a1, Norm RR)
-list_cols = ['NADH_a1',  'Norm_RR']
+##%% ################## #Top 2 (NADH a1, Norm RR)  ####################################### 2
+# list_cols = ['NADH_a1',  'Norm_RR']
+list_cols = list(forest_importances.keys()[:2])
+list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
 
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
@@ -208,6 +227,21 @@ fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test,
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label='Top two variables (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
+plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
+
+##%% ################## Top variable (NADH a1) ####################################### 1
+# list_cols = ['NADH_a1']
+list_cols = list(forest_importances.keys()[:1])
+list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
+
+X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
+
+clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
+fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+# dict_accuracies['top_1'] = accuracy
+
+# Plot of a ROC curve for a specific class
+plt.plot(fpr, tpr, label='Top variable (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## Redox + Cell Size
@@ -224,20 +258,6 @@ plt.plot(fpr, tpr, label='Norm. Redox Ratio + Cell Size (ROC AUC) = %0.2f)' % ro
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 
-##%% ################## Top variable (NADH a1)
-list_cols = ['NADH_a1']
-
-X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
-
-clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
-fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
-# dict_accuracies['top_1'] = accuracy
-
-# Plot of a ROC curve for a specific class
-plt.plot(fpr, tpr, label='Top variable (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
-plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
-
-
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.0])
 plt.xlabel('False Positive Rate', fontsize = 36)
@@ -249,6 +269,8 @@ plt.legend(bbox_to_anchor=(-0.1,-0.1), loc="upper left", fontsize = 36)
 plt.savefig('./figures/all/F5_D_RS_allcell_ROC.svg',dpi=350, bbox_inches='tight')
 plt.show()
 
+
+pprint(list_top_vars)
 
 #%% Section 5 - All cell activation classifier - Random forest, Logistic, SVM ROCs - Plot all curves together
 
@@ -865,17 +887,19 @@ print(classification_report(y_test,y_pred))
 
 print('All cell data cell type classifier')
 
-
 #List of OMI variables we want in the classifier - do NOT have to list variable with classes ('Cell_Type'), just OMI variables
 #TODO SF6 -confusion matrix and pie chart 
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
 
 # Figure 5 E accuracies ==> 
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
-# list_omi_parameters = ['NADH_tm']
-# list_omi_parameters = ['NADH_tm', 'FAD_t1']
-# list_omi_parameters = ['NADH_tm', 'FAD_t1', 'FAD_tm']
-# list_omi_parameters = ['NADH_tm', 'FAD_t1', 'FAD_tm', 'NADH_a1']
+
+# ##### Top variables
+# list_omi_parameters = ['FAD_t1']
+# list_omi_parameters = ['FAD_t1', 'FAD_tm']
+# list_omi_parameters = ['FAD_t1', 'FAD_tm', 'NADH_tm']
+# list_omi_parameters = ['FAD_t1', 'FAD_tm', 'NADH_tm', 'NADH_t1']
+# #####
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
 # list_omi_parameters = ['Norm_RR', 'Cell_Size_Pix']
 # list_omi_parameters = ['NADH_a1']
@@ -905,11 +929,6 @@ clf = RandomForestClassifier(random_state=0, class_weight=None)
 clf.fit(X_train, y_train)
 y_pred = clf.predict(X_test)
 
-print("+"*20)
-print("Figure SF6_B piechart of importance on all features")
-forest_importances = pd.Series(clf.feature_importances_*100, index=list_omi_parameters).sort_values(ascending=False)
-print(forest_importances)
-print("+"*20)
 
 #Generate and print confusion matrix
 reversefactor = dict(zip(range(len(classes)), definitions))
@@ -921,10 +940,11 @@ print("SF6_C   | T B and NK cells")
 cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'])
 print(cm_table)
 
-
-#List weights of each feature in classifier
-# for col, feature in zip(np.flip(all_df_edit.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
-#     print(col, clf.feature_importances_[feature])
+print("+"*20)
+print("Figure SF6_C piechart of importance on all features")
+forest_importances = pd.Series(clf.feature_importances_*100, index=list_omi_parameters).sort_values(ascending=False)
+print(forest_importances)
+print("+"*20)
 
 #Print metrics for classifier assessment
 print('Accuracy score =', accuracy_score(y_test, y_pred))
@@ -938,12 +958,16 @@ from sklearn.preprocessing import StandardScaler
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
 
 #List of OMI variables we want to include in the classifier. No variable with classes is needed - that is extracted later
-# SF 7 accuracies
+# SF 7 B accuracies
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
-# list_omi_parameters = ['NADH_a1']
-# list_omi_parameters = ['NADH_tm', 'NADH_a1']
-# list_omi_parameters = ['NADH_tm', 'NADH_a1',   'FAD_t1']
-# list_omi_parameters = ['NADH_tm', 'NADH_a1','FAD_tm', 'FAD_t1']
+
+# ##### Top variables
+# list_omi_parameters = ['FAD_t1']
+# list_omi_parameters = ['FAD_t1', 'FAD_tm']
+# list_omi_parameters = ['FAD_t1', 'FAD_tm','NADH_tm']
+# list_omi_parameters = ['FAD_t1', 'FAD_tm','NADH_tm', 'NADH_t1']
+# ##### Top variables
+
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
 # list_omi_parameters = ['Norm_RR', 'Cell_Size_Pix']
 
@@ -1005,16 +1029,21 @@ print('All cell data cell type + activation classifier')
 #Same classifier code structure as Section 5 - see Section 5 comments for details
 
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2']
 
 
 ## Figure 5 F
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
-# list_omi_parameters = ['NADH_a1']
-# list_omi_parameters = ['NADH_tm', 'NADH_a1']
-# list_omi_parameters = ['NADH_tm', 'NADH_a1',  'Cell_Size_Pix']
-# list_omi_parameters = ['NADH_tm', 'NADH_a1','NADH_t1', 'Cell_Size_Pix']
+
+# ##### Top variables
+# list_omi_parameters = ['FAD_t1']
+# list_omi_parameters = ['FAD_t1', 'NADH_a1']
+# list_omi_parameters = ['FAD_t1', 'NADH_a1','NADH_t1']
+# list_omi_parameters = ['FAD_t1', 'NADH_a1','NADH_t1', 'Cell_Size_Pix']
+# ##### Top variables
+
+
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
 # list_omi_parameters = ['Norm_RR', 'Cell_Size_Pix']
 
@@ -1053,7 +1082,7 @@ y_pred = np.vectorize(reversefactor.get)(y_pred)
 
 
 print("+"*20)
-print("Figure SF8_C piechart of importance on all features")
+print("Figure SF8_B piechart of importance on all features")
 forest_importances = pd.Series(clf.feature_importances_*100, index=list_omi_parameters).sort_values(ascending=False)
 print(forest_importances)
 print("+"*20)
