@@ -68,6 +68,34 @@ def calculate_roc_rf(rf_df, key='Activation'):
 # all_df = pd.read_csv('Z:/0-Projects and Experiments/RS - lymphocyte activation/data/AllCellData.csv')
 all_df = pd.read_csv('Data files/UMAPs, boxplots, ROC curves (Python)/AllCellData.csv')
 
+
+
+##%% # remove old NK donors and add new ones
+all_df = all_df[all_df['Cell_Type'] != 'NK-Cells']
+
+# load new nk cells 
+df_nk = pd.read_csv('Data files/UMAPs, boxplots, ROC curves (Python)/NKdonors11-29.csv')
+df_nk = df_nk.rename(columns={'n.t1.mean' : 'NADH_t1', 
+                              'n.t2.mean' : 'NADH_t2', 
+                              'n.a1.mean' : 'NADH_a1', 
+                              'n.tm.mean' : 'NADH_tm', 
+                              'f.t1.mean' : 'FAD_t1', 
+                              'f.t2.mean' : 'FAD_t2',
+                              'f.a1.mean' : 'FAD_a1', 
+                              'rr.mean' : 'Norm_RR', 
+                              'f.tm.mean' : 'FAD_tm', 
+                              'npix' : 'Cell_Size_Pix'
+                              })
+
+## Concat dicts
+df_concat = pd.concat([all_df,df_nk])
+df_concat['Donor'].unique()
+df_concat['Cell_Type'].unique()
+
+df_all = df_concat
+
+##%%
+
 #Add combination variables to data set
 all_df.drop(['NADH', 'Group', 'Experiment_Date'], axis=1, inplace=True)
 all_df['Type_Activation'] = all_df['Cell_Type'] + ': ' + all_df['Activation']
@@ -77,7 +105,6 @@ all_df['Donor_CellType'] = all_df['Donor'] + ': ' + all_df['Cell_Type']
 df_data = all_df.copy()
 
 #%% Section 4 - All cell activation classifier
-
 
 print('All cell activation classifier')
 
@@ -89,8 +116,6 @@ list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FA
 all_df_edit = all_df.copy()
 all_df_edit = all_df_edit[list_omi_parameters]
 classes = ['CD69-', 'CD69+']
-
-
 
 #Split training/testing data, random forest classifier
 X, y = all_df_edit.iloc[:,:-1], all_df_edit[['Activation']]
@@ -122,14 +147,13 @@ print('Accuracy score =', accuracy_score(y_test, y_pred))
 print(classification_report(y_test,y_pred))
 
 
-
 #%% Section 5 - Cell Type Classifier
 
 
 print('All cell data cell type classifier')
 
-
 #List of OMI variables we want in the classifier - do NOT have to list variable with classes ('Cell_Type'), just OMI variables
+
 #TODO SF6 -confusion matrix and pie chart 
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
 
@@ -624,7 +648,6 @@ list_entries = np.unique(df_data[legend_entries])
                     
 scatter_umaps = [hv.Scatter(df_data[df_data[legend_entries] == entry], kdims=kdims, 
                             vdims=vdims, label=entry) for entry in list_entries]
-
 
 
 colors = ["#440154", "#482173", "#433e85", "#38588c", "#2d708e", "#25858e",  "#1e9b8a",  "#2ab07f", "#52c569", "#86d549", "#c2df23", "#fde725" ]

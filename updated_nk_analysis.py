@@ -61,7 +61,22 @@ def calculate_roc_rf(rf_df, key='Activation'):
     
 #%% Section 3
 
-nk_df = pd.read_csv('./Data files/UMAPs, boxplots, ROC curves (Python)/NK data 2 groups.csv')
+# nk_df = pd.read_csv('./Data files/UMAPs, boxplots, ROC curves (Python)/NK data 2 groups.csv')
+nk_df = pd.read_csv('./Data files/UMAPs, boxplots, ROC curves (Python)/NKdonors11-29.csv')
+
+
+nk_df = nk_df.rename(columns={'n.t1.mean' : 'NADH_t1', 
+                              'n.t2.mean' : 'NADH_t2', 
+                              'n.a1.mean' : 'NADH_a1', 
+                              'n.tm.mean' : 'NADH_tm', 
+                              'f.t1.mean' : 'FAD_t1', 
+                              'f.t2.mean' : 'FAD_t2',
+                              'f.a1.mean' : 'FAD_a1', 
+                              'rr.mean' : 'Norm_RR', 
+                              'f.tm.mean' : 'FAD_tm', 
+                              'npix' : 'Cell_Size_Pix'
+                              })
+
 nk_df.drop(['NADH', 'Group', 'Experiment_Date'], axis=1, inplace=True)
 
 df_data = nk_df.copy()
@@ -174,7 +189,7 @@ overlay.opts(
 
 #Saves an interactive holoviews plot as a .HTML file
 
-hv.save(overlay, 'nk_hv_umap.html')
+hv.save(overlay, './figures/nk_hv_umap.html')
 
 #%% Section 6
 
@@ -231,8 +246,8 @@ overlay.opts(
         tools=["hover"],
         muted_alpha=0,
         aspect="equal",
-        width=600, 
-        height=600),
+        width=800, 
+        height=800),
     opts.Overlay(
         title='',
         legend_opts={"click_policy": "hide"},
@@ -240,7 +255,7 @@ overlay.opts(
         )       
     )
 
-hv.save(overlay, 'nk_hv_d_umap.html')
+hv.save(overlay, './figures/nk_hv_d_umap.html')
 
 
 #%% Section 7
@@ -301,8 +316,8 @@ overlay.opts(
         tools=["hover"],
         muted_alpha=0,
         aspect="equal",
-        width=600, 
-        height=600),
+        width=800, 
+        height=800),
     opts.Overlay(
         title='',
         legend_opts={"click_policy": "hide"},
@@ -310,7 +325,7 @@ overlay.opts(
         )       
     )
 
-hv.save(overlay, 'nk_hv_da_umap.html')
+hv.save(overlay, './figures/nk_hv_da_umap.html')
 
 #%% Section 8 
 
