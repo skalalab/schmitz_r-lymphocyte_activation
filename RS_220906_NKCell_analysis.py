@@ -47,7 +47,6 @@ plt.rcParams['svg.fonttype'] = 'none'
 from helper import run_analysis_on_classifier, _train_test_split
 #%% Section 2
 
-
 path_nk_data = './Data files/UMAPs, boxplots, ROC curves (Python)/NKdonors11-29.csv'
 nk_df = pd.read_csv(path_nk_data)
 
@@ -63,10 +62,16 @@ nk_df = nk_df.rename(columns={'n.t1.mean' : 'NADH_t1',
                               'npix' : 'Cell_Size_Pix'
                               })
 
+# keep only Activated CD69+ and Unactivated CD69-
+nk_df = nk_df[((nk_df['Group']=='Activated') & (nk_df['Activation']=='CD69+')) | 
+               ((nk_df['Group']=='Control') & (nk_df['Activation']=='CD69-'))
+               ]
 
-print(nk_df.groupby(by=['Donor','Group','Activation']).count())
 
-print(nk_df.groupby(by=['Group','Activation'])['Cell_Size_Pix'].mean())
+# print(nk_df.groupby(by=['Donor','Group','Activation']).count())
+# print(nk_df.groupby(by=['Group','Activation'])['Cell_Size_Pix'].mean())
+nk_df.groupby(['Donor','Group', 'Activation']).count()
+
 
 nk_df.drop(['NADH', 'Group', 'Experiment_Date'], axis=1, inplace=True)
 
@@ -96,7 +101,7 @@ clf = RandomForestClassifier(random_state=0).fit(X_train1, y_train1)
 fpr, tpr, roc_auc, accuracy, op_point = run_analysis_on_classifier(clf, X_test1, y_test1, dict_classes)
 
 ### Figure 4 C
-print("Figure 4C piechart of importance on all features")
+print("F4_C piechart of importance on all features")
 forest_importances = pd.Series(clf.feature_importances_*100, index=X_train1.keys()).sort_values(ascending=False)
 print(forest_importances)
 
@@ -572,18 +577,18 @@ export_svgs(plot, filename = './figures/nk/SF4_B_NKCell_Donor_ActStatus_umap.svg
 #%% Section 9 - UMAP of both groups and activation statuses of NK cells
 
 
-# SF 4 A
+# NOTE THIS USES ALL THE DATA 
+# SF 4 A   
+
 
 #Read in CSV that has data from all 4 combinations of activation/culture condition
 
 # allgroup_nk_df = pd.read_csv('Z:/0-Projects and Experiments/RS - lymphocyte activation/data/NK cells (Donors 4-6)/NK data all groups.csv')
 # allgroup_nk_df = pd.read_csv('./Data files/UMAPs, boxplots, ROC curves (Python)/NK data donors.csv')
 
+
+# RELOAD ALL THE DATA WITH ALL GROUPS
 allgroup_nk_df = pd.read_csv(path_nk_data)
-
-
-# df['Group'] = df['Group'].replace("Control", "Unstimulated")
-
 
 allgroup_nk_df = allgroup_nk_df.rename(columns={'n.t1.mean' : 'NADH_t1', 
                               'n.t2.mean' : 'NADH_t2', 
