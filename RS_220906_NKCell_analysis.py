@@ -47,7 +47,19 @@ plt.rcParams['svg.fonttype'] = 'none'
 from helper import run_analysis_on_classifier, _train_test_split
 #%% Section 2
 
-path_nk_data = './Data files/UMAPs, boxplots, ROC curves (Python)/NKdonors11-29.csv'
+
+path_nk_data = './Data files/UMAPs, boxplots, ROC curves (Python)/NK_donors_final_dec02.csv'
+nk_df = pd.read_csv(path_nk_data)
+
+# nk_df_temp = nk_df[((nk_df['Group']=='Activated') & (nk_df['Activation']=='CD69+')) | 
+#                 ((nk_df['Group']=='Control') & (nk_df['Activation']=='CD69-'))
+#                 ]
+
+nk_df.groupby(['Group','Donor', 'Activation'])['rr.mean'].mean()
+
+
+#%%
+path_nk_data = './Data files/UMAPs, boxplots, ROC curves (Python)/NK_donors_final_dec02.csv'
 nk_df = pd.read_csv(path_nk_data)
 
 nk_df = nk_df.rename(columns={'n.t1.mean' : 'NADH_t1', 
@@ -62,6 +74,21 @@ nk_df = nk_df.rename(columns={'n.t1.mean' : 'NADH_t1',
                               'npix' : 'Cell_Size_Pix'
                               })
 
+### normalize to control
+nk_df.groupby(['Group','Donor', 'Activation'])['Norm_RR'].mean()
+
+for donor in nk_df['Donor'].unique():
+    pass 
+    mean_control = nk_df[(nk_df['Donor'] == donor) & 
+                         (nk_df['Group'] == "Control")&
+                          (nk_df['Activation'] == "CD69-")
+                             ]["Norm_RR"].mean()
+    nk_df.loc[(nk_df['Donor'] == donor),'Norm_RR'] = (nk_df.loc[(nk_df['Donor'] == donor),'Norm_RR'] / mean_control)
+
+# print("+" * 20)
+nk_df.groupby(['Donor','Group', 'Activation'])['Norm_RR'].mean()
+
+    
 # keep only Activated CD69+ and Unactivated CD69-
 nk_df = nk_df[((nk_df['Group']=='Activated') & (nk_df['Activation']=='CD69+')) | 
                ((nk_df['Group']=='Control') & (nk_df['Activation']=='CD69-'))
@@ -496,7 +523,7 @@ overlay.opts(
 plot = hv.render(overlay)
 plot.output_backend = "svg"
 export_svgs(plot, filename = './figures/nk/NF_NKCell_Donor_umap.svg')
-# hv.save(overlay, './figures/NKCell_Donor_umap.html')
+hv.save(overlay, './figures/NKCell_Donor_umap.html')
 
 
 #%% Section 8 - Nk cell donor + activation UMAP
@@ -512,7 +539,6 @@ df_data['Donor_Activation'] = df_data['Donor'] + ': ' + df_data['Activation']
 #Same structure as Section 6 - see comments above
 
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
-# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2']
 
 data = df_data[list_omi_parameters].values
 scaled_data = StandardScaler().fit_transform(data)
@@ -582,10 +608,6 @@ export_svgs(plot, filename = './figures/nk/SF4_B_NKCell_Donor_ActStatus_umap.svg
 
 
 #Read in CSV that has data from all 4 combinations of activation/culture condition
-
-# allgroup_nk_df = pd.read_csv('Z:/0-Projects and Experiments/RS - lymphocyte activation/data/NK cells (Donors 4-6)/NK data all groups.csv')
-# allgroup_nk_df = pd.read_csv('./Data files/UMAPs, boxplots, ROC curves (Python)/NK data donors.csv')
-
 
 # RELOAD ALL THE DATA WITH ALL GROUPS
 allgroup_nk_df = pd.read_csv(path_nk_data)

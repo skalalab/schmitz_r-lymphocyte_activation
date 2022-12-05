@@ -66,7 +66,11 @@ nv.tm <- nv.t1*nv.a1/100+nv.t2*(1-nv.a1/100)
 fv.tm <- fv.t1*(fv.a1/100)+fv.t2*(1-fv.a1/100)
 #combo.v <- as.vector(bothmask)
 
+
+  
 pix <- data.frame(nv.p, nv.t1, nv.t2, nv.a1, nv.chi, fv.p, fv.t1, fv.t2, fv.a1, fv.a2, fv.chi, fv.p, fv.a1, rrv, nv.tm, fv.tm,  cells.v, cyto.v)
+
+mask_whole_cell = aggregate(pix, list(pix$cells.v), length)
 
 pix <- subset(pix, nv.chi<10000&fv.chi<10000&fv.chi>0&nv.chi>0)
 pix <- subset(pix, cyto.v>0)

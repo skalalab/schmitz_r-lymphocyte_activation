@@ -8,12 +8,7 @@ import holoviews as hv
 from holoviews import  opts
 hv.extension('bokeh')
 
-df = pd.read_csv(r"Data files/UMAPs, boxplots, ROC curves (Python)/NKdonors11-29.csv")
-
-# df = pd.read_csv(r"Data files/UMAPs, boxplots, ROC curves (Python)/NK data donors_updated_221118.csv")
-# df = pd.read_csv(r"Data files/UMAPs, boxplots, ROC curves (Python)/NK data all groups.csv")
-# df = pd.read_csv(r"Data files/UMAPs, boxplots, ROC curves (Python)/NK data donors_updated_221118_updated IRFs for 220303.csv")
-
+df = pd.read_csv(r"Data files/UMAPs, boxplots, ROC curves (Python)/NK_donors_final_dec02.csv")
 
 df['Group'] = df['Group'].replace("Control", "Unstimulated")
 
@@ -84,8 +79,10 @@ df.groupby(['Group','Activation','Donor'])['Cell_Size_Pix'].mean()
 
 #%% SCATTER PLOT BY DONOR BY ACTIVATION
 
-dish = 'Unstimulated'
-# dish = 'Activated'
+from datetime import datetime
+
+# dish = 'Unstimulated'
+dish = 'Activated'
 
 vdim = 'NADH_tm'
 # vdim = 'FAD_tm'
@@ -131,7 +128,8 @@ overlay.opts(
         ),       
 )  
 
-hv.save(overlay, f'./figures/ecg_scatter_{dish}_{vdim}_20221129.html')
+d = datetime.now()
+hv.save(overlay, f'./figures/ecg_scatter_{dish}_{vdim}_{d.year}{str(d.month).zfill(2)}{str(d.day).zfill(2)}.html')
 
 
 

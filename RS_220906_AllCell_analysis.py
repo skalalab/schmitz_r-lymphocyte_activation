@@ -43,6 +43,7 @@ sns.set_style(style='white')
 plt.rcParams['svg.fonttype'] = 'none'
 
 from helper import run_analysis_on_classifier, _train_test_split
+
 #%% Section 2 - Define ROC function
 
 
@@ -91,7 +92,7 @@ all_df = pd.read_csv('./Data files/UMAPs, boxplots, ROC curves (Python)/AllCellD
 all_df = all_df[all_df['Cell_Type'] != 'NK-Cells']
 
 # load new nk cells 
-df_nk = pd.read_csv('Data files/UMAPs, boxplots, ROC curves (Python)/NKdonors11-29.csv')
+df_nk = pd.read_csv('Data files/UMAPs, boxplots, ROC curves (Python)/NK_donors_final_dec02.csv')
 df_nk = df_nk.rename(columns={'n.t1.mean' : 'NADH_t1', 
                               'n.t2.mean' : 'NADH_t2', 
                               'n.a1.mean' : 'NADH_a1', 
@@ -135,7 +136,7 @@ dict_classes = {label_int : label_class for label_int, label_class in enumerate(
 
 print(all_df.groupby(by=['Cell_Type','Donor','Activation',])['Cell_Size_Pix'].count())
 print("*" * 20)
-print(all_df.groupby(by=['Cell_Type','Donor','Activation'])['Cell_Size_Pix'].mean())
+print(all_df.groupby(by=['Cell_Type','Donor','Activation'])['Norm_RR'].mean())
 
 
 
@@ -898,12 +899,12 @@ list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FA
 
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
 
-# # ##### Top variables
+# # # ##### Top variables
 # list_omi_parameters = ['FAD_t1']
 # list_omi_parameters = ['FAD_t1', 'FAD_tm']
 # list_omi_parameters = ['FAD_t1', 'FAD_tm', 'NADH_tm']
-# list_omi_parameters = ['FAD_t1', 'FAD_tm', 'NADH_tm', 'NADH_t1']
-# # #####
+# list_omi_parameters = ['FAD_t1', 'FAD_tm', 'NADH_tm', 'FAD_a1']
+# # # #####
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
 # list_omi_parameters = ['Norm_RR', 'Cell_Size_Pix']
 # list_omi_parameters = ['NADH_a1']
@@ -965,12 +966,12 @@ list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FA
 # SF 7 B accuracies
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
 
-# # ##### Top variables
+# # # ##### Top variables
 # list_omi_parameters = ['FAD_t1']
 # list_omi_parameters = ['FAD_t1', 'FAD_tm']
 # list_omi_parameters = ['FAD_t1', 'FAD_tm','NADH_tm']
-# list_omi_parameters = ['FAD_t1', 'FAD_tm','NADH_tm', 'NADH_t1']
-# # ##### Top variables
+# list_omi_parameters = ['FAD_t1', 'FAD_tm','NADH_tm', 'NADH_a1']
+# # # ##### Top variables
 
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
 # list_omi_parameters = ['Norm_RR', 'Cell_Size_Pix']
@@ -1033,21 +1034,21 @@ print('All cell data cell type + activation classifier')
 #Same classifier code structure as Section 5 - see Section 5 comments for details
 
 
-# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
-
-## Figure 5 F
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
 
-# ##### Top variables
-list_omi_parameters = ['NADH_t1']
-list_omi_parameters = ['NADH_t1', 'NADH_a1']
-list_omi_parameters = ['NADH_t1', 'NADH_a1','FAD_t1']
-list_omi_parameters = ['NADH_t1', 'NADH_a1','FAD_t1', 'NADH_tm']
-# ##### Top variables
+## Figure 5 F
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+
+# # ##### Top variables
+# list_omi_parameters = ['NADH_a1']
+# list_omi_parameters = ['NADH_a1', 'NADH_t1']
+# list_omi_parameters = ['NADH_a1', 'NADH_t1','NADH_tm']
+# list_omi_parameters = ['NADH_a1', 'NADH_t1','NADH_tm', 'Cell_Size_Pix']
+# # # ##### Top variables
 
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
-list_omi_parameters = ['Norm_RR', 'Cell_Size_Pix']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
+# list_omi_parameters = ['Norm_RR', 'Cell_Size_Pix']
 
 
 all_df_edit = all_df.copy()
