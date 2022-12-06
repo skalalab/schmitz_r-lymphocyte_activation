@@ -105,6 +105,22 @@ df_nk = df_nk.rename(columns={'n.t1.mean' : 'NADH_t1',
                               'npix' : 'Cell_Size_Pix'
                               })
 
+df_nk.groupby(['Donor','Group', 'Activation'])['Norm_RR'].mean()
+
+
+# normalize NK cells to donor
+for donor in df_nk['Donor'].unique():
+    pass 
+    mean_control = df_nk[(df_nk['Donor'] == donor) & 
+                         (df_nk['Group'] == "Control")&
+                          (df_nk['Activation'] == "CD69-")
+                             ]["Norm_RR"].mean()
+    df_nk.loc[(df_nk['Donor'] == donor),'Norm_RR'] = (df_nk.loc[(df_nk['Donor'] == donor),'Norm_RR'] / mean_control)
+
+# print("+" * 20)
+df_nk.groupby(['Donor','Group', 'Activation'])['Norm_RR'].mean()
+
+
 # keep only Activated CD69+ and Unactivated CD69-
 df_nk = df_nk[((df_nk['Group']=='Activated') & (df_nk['Activation']=='CD69+')) | 
                ((df_nk['Group']=='Control') & (df_nk['Activation']=='CD69-'))
@@ -157,7 +173,7 @@ custom_color = sns.set_palette(sns.color_palette(colors))
 list_top_vars = []
 ##%% ################## 10 features
 
-list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] #, 'Cell_Size_Pix'
 
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
@@ -176,7 +192,7 @@ plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## NADH variables + Cell Size
 
-list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
+list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] # , 'Cell_Size_Pix'
 
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
@@ -251,7 +267,7 @@ plt.plot(fpr, tpr, label='Top variable (ROC AUC) = %0.2f)' % roc_auc, linewidth 
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## Redox + Cell Size
-list_cols = ['Cell_Size_Pix',  'Norm_RR']
+list_cols = [ 'Norm_RR'] #, 'Cell_Size_Pix'
 
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
@@ -293,7 +309,7 @@ colors = ['#fde725', '#1f988b','#440154']
 
 custom_color = sns.set_palette(sns.color_palette(colors))
 
-list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] #, 'Cell_Size_Pix'
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
 clf = RandomForestClassifier(random_state=0, class_weight=class_weight).fit(X_train, y_train)
@@ -340,14 +356,14 @@ plt.show()
 # SF5 A
  
 #list of parameters we want to use for the UMAP. I used ten OMI features (Normalized redox ratio, NAD(P)H lifetimes, FAD lifetimes, and cell size)
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 
 #generate UMAP
 data = df_data[list_omi_parameters].values
 scaled_data = StandardScaler().fit_transform(data)
 reducer = umap.UMAP(
-               n_neighbors=15,
+               n_neighbors=15,  
                min_dist=1,   
                metric='euclidean',
                n_components=2,
@@ -415,7 +431,7 @@ export_svgs(plot, filename = './figures/all/SF5_A_AllCell_ActStatus_umap.svg')
 
 #Same structure as Section 6 - see comments for more detail 
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 data = df_data[list_omi_parameters].values
 scaled_data = StandardScaler().fit_transform(data)
@@ -485,7 +501,7 @@ export_svgs(plot, filename = './figures/all/SF6_A_AllCell_CellType_umap.svg')
 # SF7_A
 #Same structure as Section 6 - see comments for more detail 
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 df_data_qonly = df_data.loc[df_data['Activation'] == 'CD69-']
 
@@ -556,7 +572,7 @@ export_svgs(plot, filename = './figures/all/SF7_A_AllCell_CellType_QuiOnly_umap.
 
 #Same structure as Section 6 - see comments for more detail 
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 data = df_data[list_omi_parameters].values
 scaled_data = StandardScaler().fit_transform(data)
@@ -630,7 +646,7 @@ export_svgs(plot, filename = './figures/all/F5_C_AllCell_CellType_ActStatus_umap
 #Same structure as Section 6 - see comments for more detail 
 
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 data = df_data[list_omi_parameters].values
 scaled_data = StandardScaler().fit_transform(data)
@@ -700,7 +716,7 @@ export_svgs(plot, filename = './figures/all/NF_AllCell_CellType_Donor_umap.svg')
 #Same structure as Section 6 - see comments for more detail 
 
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 data = df_data[list_omi_parameters].values
 scaled_data = StandardScaler().fit_transform(data)
@@ -845,7 +861,7 @@ def calculate_roc_rf(rf_df, key='Activation'):
 print('All cell activation classifier')
 
 #List of OMI variables we want in the classifier (**Make sure Activation is last item in list)
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix', 'Activation']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR',  'Activation'] # , 'Cell_Size_Pix'
 
    
 #Make copy of main data frame, pull out OMI variables we want in classifier
@@ -893,20 +909,20 @@ print('All cell data cell type classifier')
 
 #List of OMI variables we want in the classifier - do NOT have to list variable with classes ('Cell_Type'), just OMI variables
 #TODO SF6 -confusion matrix and pie chart 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 # F5 E accuracies
 
-# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
-# # # ##### Top variables
-# list_omi_parameters = ['FAD_t1']
-# list_omi_parameters = ['FAD_t1', 'FAD_tm']
-# list_omi_parameters = ['FAD_t1', 'FAD_tm', 'NADH_tm']
-# list_omi_parameters = ['FAD_t1', 'FAD_tm', 'NADH_tm', 'FAD_a1']
-# # # #####
-# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
-# list_omi_parameters = ['Norm_RR', 'Cell_Size_Pix']
+# # # # # # # ##### Top variables
+# list_omi_parameters = ['FAD_tm']
+# list_omi_parameters = ['FAD_tm', 'FAD_t1']
+# list_omi_parameters = ['FAD_tm', 'FAD_t1', 'NADH_tm']
+# list_omi_parameters = ['FAD_tm', 'FAD_t1', 'NADH_tm', 'FAD_a1']
+# # # # # # # #####
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] # , 'Cell_Size_Pix'
+# list_omi_parameters = ['Norm_RR', ] #'Cell_Size_Pix'
 # list_omi_parameters = ['NADH_a1']
    
 #Make copy of main data frame, pull out OMI variables we want in classifier
@@ -960,21 +976,21 @@ from sklearn.preprocessing import StandardScaler
 
 #TODO SF7 D confusion matrix and pie chart
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 #List of OMI variables we want to include in the classifier. No variable with classes is needed - that is extracted later
 # SF 7 B accuracies
-# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] #, 'Cell_Size_Pix'
 
-# # # ##### Top variables
-# list_omi_parameters = ['FAD_t1']
-# list_omi_parameters = ['FAD_t1', 'FAD_tm']
-# list_omi_parameters = ['FAD_t1', 'FAD_tm','NADH_tm']
-# list_omi_parameters = ['FAD_t1', 'FAD_tm','NADH_tm', 'NADH_a1']
-# # # ##### Top variables
+# # # # # # # ##### Top variables
+# list_omi_parameters = ['FAD_tm']
+# list_omi_parameters = ['FAD_tm', 'FAD_t1']
+# list_omi_parameters = ['FAD_tm', 'FAD_t1','NADH_tm']
+# list_omi_parameters = ['FAD_tm', 'FAD_t1','NADH_tm', 'NADH_a1']
+# # # # # # # ##### Top variables
 
-# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
-# list_omi_parameters = ['Norm_RR', 'Cell_Size_Pix']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] #, 'Cell_Size_Pix'
+# list_omi_parameters = ['Norm_RR'] # , 'Cell_Size_Pix'
 
 #Create subset of dataset that only contains CD69- control cells 
 all_df_qonly = all_df.loc[all_df['Activation']=='CD69-']
@@ -1034,21 +1050,21 @@ print('All cell data cell type + activation classifier')
 #Same classifier code structure as Section 5 - see Section 5 comments for details
 
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] #, 'Cell_Size_Pix'
 
-## Figure 5 F
-# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+# # # ## Figure 5 F
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
-# # ##### Top variables
+# # # # # ##### Top variables
 # list_omi_parameters = ['NADH_a1']
 # list_omi_parameters = ['NADH_a1', 'NADH_t1']
-# list_omi_parameters = ['NADH_a1', 'NADH_t1','NADH_tm']
-# list_omi_parameters = ['NADH_a1', 'NADH_t1','NADH_tm', 'Cell_Size_Pix']
-# # # ##### Top variables
+# list_omi_parameters = ['NADH_a1', 'NADH_t1',] # , 'Cell_Size_Pix'
+# list_omi_parameters = ['NADH_a1', 'NADH_t1', 'NADH_tm'] # , 'Cell_Size_Pix'
+# # # # # # ##### Top variables
 
 
-# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
-# list_omi_parameters = ['Norm_RR', 'Cell_Size_Pix']
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] # , 'Cell_Size_Pix'
+# list_omi_parameters = ['Norm_RR'] # , 'Cell_Size_Pix'
 
 
 all_df_edit = all_df.copy()

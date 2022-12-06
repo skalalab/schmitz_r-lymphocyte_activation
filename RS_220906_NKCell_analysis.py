@@ -77,6 +77,7 @@ nk_df = nk_df.rename(columns={'n.t1.mean' : 'NADH_t1',
 ### normalize to control
 nk_df.groupby(['Group','Donor', 'Activation'])['Norm_RR'].mean()
 
+# normalize NK cells to donor
 for donor in nk_df['Donor'].unique():
     pass 
     mean_control = nk_df[(nk_df['Donor'] == donor) & 
@@ -120,7 +121,7 @@ list_top_vars = []
 colors = ['#fde725', '#a5db36', '#4ac16d','#1f988b','#2a788e','#414487', '#440154']
 custom_color = sns.set_palette(sns.color_palette(colors))
 
-list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 X_train1, X_test1, y_train1, y_test1 = _train_test_split(nk_df, list_cols, classes)
 
 ##%%  ################### 10 features 
@@ -139,7 +140,7 @@ plt.plot(fpr, tpr, label=f'All variables (ROC AUC = {roc_auc:0.2f})' , linewidth
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ###################NADH variables + Cell Size
-list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
+list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] # , 'Cell_Size_Pix'
 
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
@@ -209,7 +210,7 @@ plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################### Redox + Cell Size
 
-list_cols = ['Cell_Size_Pix',  'Norm_RR']
+list_cols = [  'Norm_RR'] # 'Cell_Size_Pix',
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy,  op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
@@ -329,7 +330,7 @@ colors = ['#fde725', '#1f988b','#440154']
 custom_color = sns.set_palette(sns.color_palette(colors))
 
 # selet data 
-list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 
@@ -387,7 +388,7 @@ plt.show()
 
 #list of parameters we want to use for the UMAP. I used ten OMI features (Normalized redox ratio, NAD(P)H lifetimes, FAD lifetimes, and cell size)
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 
 df_data = nk_df.copy()
@@ -462,7 +463,7 @@ export_svgs(plot, filename = './figures/nk/F4_B_NKCell_ActStatus_umap.svg')
 
 #Same structure as Section 6 - see comments above
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 df_data = nk_df.copy()
 
@@ -538,7 +539,7 @@ df_data['Donor_Activation'] = df_data['Donor'] + ': ' + df_data['Activation']
 
 #Same structure as Section 6 - see comments above
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 data = df_data[list_omi_parameters].values
 scaled_data = StandardScaler().fit_transform(data)
@@ -633,7 +634,7 @@ df_data['Group_Activation'] = df_data['Group'] + ': ' + df_data['Activation']
 
 
 #Same structure as Section 5 - see comments above
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 data = df_data[list_omi_parameters].values
 scaled_data = StandardScaler().fit_transform(data)
