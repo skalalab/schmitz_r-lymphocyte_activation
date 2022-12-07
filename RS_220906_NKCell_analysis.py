@@ -237,79 +237,109 @@ pprint(list_top_vars)
 #%% Section 4 - donor color coding boxplots: Red/blue, all dots visible
 
 
-# Figure 3 H
+# Figure 3 FGHI
 
-df = nk_df.copy()
+dict_figures = {
+            'F' : {
+                'y_axis_col_name' : 'Norm_RR',
+                "y_label" : r'Normalized Redox Ratio'
+                },
+            'G' : {
+                'y_axis_col_name' : 'NADH_tm',
+                "y_label" : r'NAD(P)H $\tau m$'
+                },
+            'H' : {
+                'y_axis_col_name' : 'NADH_a1',
+                "y_label" : r'NAD(P)H $\alpha _1$'
+                },
+            'I' : {
+                'y_axis_col_name' : 'FAD_tm',
+                "y_label" : r'FAD $\tau m$'
+                
+                },
+            }
 
-f, ax = plt.subplots(figsize=(8,20))
-
-#colors = ['#fde725', '#21918c', '#440154']
-#custom_color = sns.set_palette(sns.color_palette(colors))
-# colors = {'CD69- D':'#222255', 
-#           'CD69- E':'#4393C3', 
-#           'CD69- F':'#99DDFF',
-#           'CD69+ D':'#662506', 
-#           'CD69+ E':'#D6604D', 
-#           'CD69+ F':'#F4A582'}
-
-colors = {'CD69- D':'#222255', 
-          'CD69- M':'#4393C3', 
-          'CD69- N':'#99DDFF',
-          'CD69+ D':'#662506', 
-          'CD69+ M':'#D6604D', 
-          'CD69+ N':'#F4A582'}
-
-
-sns.set_style(style='white')
-
-
-PROPS_BLACK = {'boxprops': {'facecolor': 'none', 'edgecolor': 'black'},
-               'medianprops': {'color': 'black'},
-               'whiskerprops': {'color': 'black'},
-               'capprops': {'color': 'black'}}
-
-boxplot_line_width= 5
-boxplot_width = 0.9
-x_axis_col_name = 'Activation'
-y_axis_col_name = 'NADH_a1'
-
-#graph with indiviual palette
-
-sns.swarmplot(x='Activation', y='NADH_a1', hue='Act_Donor',  order = ['CD69-', 'CD69+'], palette = colors, size = 5.2, data = df, zorder = 0.5)
-sns.boxplot(x=x_axis_col_name,
-            y=y_axis_col_name,
-            data=df,
-            order = ['CD69-', 'CD69+'],
-            linewidth=boxplot_line_width,
-            width=boxplot_width,
-            showfliers=False,
-            zorder=1,
-            **PROPS_BLACK)
-
-#get and order legend labels to pass to pyplot
-handles,labels = ax.get_legend_handles_labels()
-
-handles = [handles[1], handles[3], handles[5], handles[0], handles[2], handles[4]]
-labels = [labels[1], labels[3], labels[5], labels[0], labels[2], labels[4]]
-
-
-#customize plot
-plt.xlabel('', size = 1)
-plt.ylabel(r'NAD(P)H $\alpha _1$', size = 40, fontweight='bold')
-#plt.ylabel('Normalized Redox Ratio', size = 40, fontweight='bold')
-plt.xticks(size = 36, fontweight='bold')
-plt.yticks(size = 30, fontweight='bold')
-#plt.legend(handles,labels,loc = 'lower right', fontsize = 36)
-plt.legend([],[], frameon=False)
-
-#add bar for p-value
-x1, x2 = 0, 1   
-y, h, col = nk_df['NADH_a1'].max() + 0.5, 0.5, 'k'
-plt.tight_layout()
-plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=5, c=col)
-plt.text((x1+x2)*.5, y+h, "****", ha='center', va='bottom', color=col, size = 40)
-
-plt.savefig('./figures/nk/F3_H_RS_nk_na1.svg',dpi=350, bbox_inches='tight')
+for fig_letter, fig_dict in dict_figures.items():
+    pass
+    df = nk_df.copy()
+    
+    f, ax = plt.subplots(figsize=(8,20))
+    
+    #colors = ['#fde725', '#21918c', '#440154']
+    #custom_color = sns.set_palette(sns.color_palette(colors))
+    # colors = {'CD69- D':'#222255', 
+    #           'CD69- E':'#4393C3', 
+    #           'CD69- F':'#99DDFF',
+    #           'CD69+ D':'#662506', 
+    #           'CD69+ E':'#D6604D', 
+    #           'CD69+ F':'#F4A582'}
+    
+    colors = {'CD69- D':'#222255', 
+              'CD69- M':'#4393C3', 
+              'CD69- N':'#99DDFF',
+              'CD69+ D':'#662506', 
+              'CD69+ M':'#D6604D', 
+              'CD69+ N':'#F4A582'}
+    
+    
+    sns.set_style(style='white')
+    
+    
+    PROPS_BLACK = {'boxprops': {'facecolor': 'none', 'edgecolor': 'black'},
+                   'medianprops': {'color': 'black'},
+                   'whiskerprops': {'color': 'black'},
+                   'capprops': {'color': 'black'}}
+    
+    boxplot_line_width= 5
+    boxplot_width = 0.9
+    x_axis_col_name = 'Activation'
+    y_axis_col_name = dict_figures[fig_letter]['y_axis_col_name'] # NADH_a1'
+    
+    #graph with indiviual palette
+    
+    sns.swarmplot(x='Activation', 
+                  y=y_axis_col_name, 
+                  hue='Act_Donor',  
+                  order = ['CD69-', 'CD69+'], 
+                  palette = colors, 
+                  size = 5.2, 
+                  data = df, zorder = 0.5)
+    sns.boxplot(x=x_axis_col_name,
+                y=y_axis_col_name,
+                data=df,
+                order = ['CD69-', 'CD69+'],
+                linewidth=boxplot_line_width,
+                width=boxplot_width,
+                showfliers=False,
+                zorder=1,
+                **PROPS_BLACK)
+    
+    #get and order legend labels to pass to pyplot
+    handles,labels = ax.get_legend_handles_labels()
+    
+    handles = [handles[1], handles[3], handles[5], handles[0], handles[2], handles[4]]
+    labels = [labels[1], labels[3], labels[5], labels[0], labels[2], labels[4]]
+    
+    
+    #customize plot
+    plt.xlabel('', size = 1)
+    plt.ylabel(dict_figures[fig_letter]['y_label'], size = 40, fontweight='bold')
+    #plt.ylabel('Normalized Redox Ratio', size = 40, fontweight='bold')
+    plt.xticks(size = 36, fontweight='bold')
+    plt.yticks(size = 30, fontweight='bold')
+    #plt.legend(handles,labels,loc = 'lower right', fontsize = 36)
+    plt.legend([],[], frameon=False)
+    
+    #add bar for p-value
+    x1, x2 = 0, 1   
+    # y, h, col = nk_df[y_axis_col_name].max() + 0.5, 0.5, 'k'
+    offset = nk_df[y_axis_col_name].max() * 0.01
+    y, h, col = nk_df[y_axis_col_name].max() + offset, offset, 'k'
+    plt.tight_layout()
+    plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=5, c=col)
+    plt.text((x1+x2)*.5, y+h, "****", ha='center', va='bottom', color=col, size = 40)
+    
+    plt.savefig(f'./figures/nk/F3_{fig_letter}_RS_nk_{fig_dict["y_axis_col_name"]}.svg',dpi=350, bbox_inches='tight')
 
 
 
