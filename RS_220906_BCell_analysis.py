@@ -80,6 +80,10 @@ bcell_df.drop(['NADH', 'Experiment_Date'], axis=1, inplace=True)
 
 bcell_df['Act_Donor'] = bcell_df['Activation'] + ' ' + bcell_df['Donor']
 
+
+bcell_df.groupby(by=['Donor','Group','Activation'])['Cell_Type'].count()
+
+
 df_data = bcell_df.copy()
 
 classes = ['CD69-', 'CD69+']
@@ -101,31 +105,40 @@ custom_color = sns.set_palette(sns.color_palette(colors))
 
 ##%% ################## 10 features
 #Generate df with only the OMI variables we want to include in the classifier (***Always keep Activation column last)
-list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
+
 
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
 dict_accuracies['Top_10'] = accuracy
+
+### Figure 4 C
+print("F2_C piechart of importance on all features")
+forest_importances = pd.Series(clf.feature_importances_*100, index=X_train.keys()).sort_values(ascending=False)
+print(forest_importances)
+
 # Plot of a ROC curve for a specific class
 plt.figure()
 plt.plot(fpr, tpr, label='All variables (ROC AUC = %0.2f)' % roc_auc, linewidth = 5)
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## NADH variables + Cell Size
-list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'Cell_Size_Pix']
+list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] # , 'Cell_Size_Pix'
+
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
 dict_accuracies['nadh_and_cell_size'] = accuracy
 
 # Plot of a ROC curve for a specific class
-plt.plot(fpr, tpr, label='NAD(P)H variables + Cell Size (ROC AUC = %0.2f)' % roc_auc, linewidth = 5)
+plt.plot(fpr, tpr, label='NAD(P)H variables (ROC AUC = %0.2f)' % roc_auc, linewidth = 5) # + Cell Size
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## Top 4 (NADH a1, NADH tm, FAD t2, NADH t1)
 
-list_cols = ['NADH_tm', 'NADH_a1', 'FAD_t2',  'NADH_t1']
+# list_cols = ['NADH_tm', 'NADH_a1', 'FAD_t2',  'NADH_t1']
+list_cols = list(forest_importances.keys()[:4])
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
@@ -137,7 +150,8 @@ plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## Top 3 (NADH a1, NADH tm, FAD t2)
 
-list_cols = ['NADH_tm', 'NADH_a1',  'FAD_t2']
+# list_cols = ['NADH_tm', 'NADH_a1',  'FAD_t2']
+list_cols = list(forest_importances.keys()[:3])
 
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
@@ -149,7 +163,8 @@ plt.plot(fpr, tpr, label='Top three variables (ROC AUC) = %0.2f)' % roc_auc, lin
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## Top 2 (NADH a1, NADH tm)
-list_cols = ['NADH_a1',  'NADH_tm']
+# list_cols = ['NADH_a1',  'NADH_tm']
+list_cols = list(forest_importances.keys()[:2])
 
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
@@ -162,7 +177,8 @@ plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## Top variable (NADH a1)
 
-list_cols = ['NADH_a1']
+# list_cols = ['NADH_a1']
+list_cols = list(forest_importances.keys()[:1])
 
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
@@ -175,7 +191,7 @@ plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## Redox + Cell Size
 
-list_cols = ['Cell_Size_Pix',  'Norm_RR']
+list_cols = ['Norm_RR'] # 'Cell_Size_Pix',  
 
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
@@ -184,7 +200,7 @@ fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test,
 dict_accuracies['redox_cell_size'] = accuracy
 
 # Plot of a ROC curve for a specific class
-plt.plot(fpr, tpr, label='Norm. Redox Ratio + Cell Size (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
+plt.plot(fpr, tpr, label='Norm. Redox Ratio (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5) #  + Cell Size 
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 plt.xlim([0.0, 1.0])
@@ -195,7 +211,7 @@ plt.xticks(fontsize = 36)
 plt.yticks(fontsize = 36)
 plt.title('Figure 2. Bcells', fontsize = 36)
 plt.legend(bbox_to_anchor=(-0.1,-0.1), loc="upper left", fontsize = 36)
-plt.savefig('./figures/Figure2_RS_bcell_ROC.svg',dpi=350, bbox_inches='tight')
+plt.savefig('./figures/b/F2_C_RS_bcell_ROC.svg',dpi=350, bbox_inches='tight')
 plt.show()
 
 print("B Cell Accuracies - Random Forest")
@@ -265,7 +281,7 @@ plt.tight_layout()
 plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=5, c=col)
 plt.text((x1+x2)*.5, y+h, "****", ha='center', va='bottom', color=col, size = 40)
 
-plt.savefig('./figures/bcell_rr.svg',dpi=350)
+plt.savefig('./figures/b/bcell_rr.svg',dpi=350)
 
 
 #%% Section 6 - ROC curves: Random forest, Logistic Regression, SVM 
@@ -282,7 +298,7 @@ custom_color = sns.set_palette(sns.color_palette(colors))
 class_weight = None 
 # class_weight = 'balanced'
 
-list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 
 ##%% ################## RANDOM FOREST
@@ -318,7 +334,7 @@ plt.xticks(fontsize = 36)
 plt.yticks(fontsize = 36)
 plt.title(f'SF2. B Cells | class_weight: {class_weight}', fontsize = 36)
 plt.legend(bbox_to_anchor=(-0.1,-0.1), loc="upper left", fontsize = 36)
-plt.savefig('./figures/SF2_RS_bcell_SVMLR_ROC.svg',dpi=350, bbox_inches='tight')
+plt.savefig('./figures/b/SF2_RS_bcell_SVMLR_ROC.svg',dpi=350, bbox_inches='tight')
 
 plt.show()
 
@@ -326,7 +342,9 @@ plt.show()
 
 #list of parameters we want to use for the UMAP. I used ten OMI features (Normalized redox ratio, NAD(P)H lifetimes, FAD lifetimes, and cell size)
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+# F2_B Activation
+
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 
 #generate UMAP
@@ -390,16 +408,19 @@ overlay.opts(
 #Saves an interactive holoviews plot as a .HTML file
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/BCell_ActStatus_umap.svg')
+export_svgs(plot, filename = './figures/b/F2_B_BCell_ActStatus_umap.svg')
 # hv.save(overlay, 'BCell_ActStatus_umap.html')
 
 
 #%%  Section 8 - B-cell UMAP - By donor
 
+
+# NF not in figure
+
 #Same structure as Section 7 - see comments above
 
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 data = df_data[list_omi_parameters].values
 scaled_data = StandardScaler().fit_transform(data)
@@ -459,19 +480,21 @@ overlay.opts(
 #saves UMAP as interactive HMTL
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/BCell_Donor_umap.svg')
+export_svgs(plot, filename = './figures/b/NF_BCell_Donor_umap.svg')
 # hv.save(overlay, 'BCell_Donor_umap.html')
 
 
 #%%  Section 9 - B-cell UMAP - by donor and activation 
 
 
+# SF2_B
+
 #Generate column in data frame that has both donor and activation status
 df_data['Donor_Activation'] = df_data['Donor'] + ': ' + df_data['Activation']
 
 
 #Same structure as Section 7 - see comments above
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 data = df_data[list_omi_parameters].values
 scaled_data = StandardScaler().fit_transform(data)
@@ -530,12 +553,14 @@ overlay.opts(
 
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/BCell_Donor_ActStatus_umap.svg')
+export_svgs(plot, filename = './figures/b/SF2_B_BCell_Donor_ActStatus_umap.svg')
 # hv.save(overlay, 'BCell_Donor_ActStatus_umap.html')
 
 
 #%%  Section 10 - B-cell data UMAP with all groups (Activated + Quiescent, CD69+ and CD69-)
 
+
+# SF2_A
 
 #Read in CSV that has data from all 4 combinations of activation/culture condition
 # allgroup_b_df = pd.read_csv('Z:/0-Projects and Experiments/RS - lymphocyte activation/data/B-cells (Donors 1-3)/Bcell_cyto_data.csv')
@@ -550,7 +575,7 @@ df_data['Group_Activation'] = df_data['Group'] + ': ' + df_data['Activation']
 
 
 #Same structure as Section 7 - see comments above
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR', 'Cell_Size_Pix']
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 data = df_data[list_omi_parameters].values
 scaled_data = StandardScaler().fit_transform(data)
@@ -609,7 +634,7 @@ overlay.opts(
 
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/BCell_ActStatus_Condition_umap.svg')
+export_svgs(plot, filename = './figures/b/SF2_A_BCell_ActStatus_Condition_umap.svg')
 
 # hv.save(overlay, 'BCell_ActStatus_Condition_umap.html')
 

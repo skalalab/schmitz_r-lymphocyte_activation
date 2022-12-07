@@ -147,7 +147,7 @@ clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
 
 # Plot of a ROC curve for a specific class
-plt.plot(fpr, tpr, label=f'NAD(P)H variables + Cell Size (ROC AUC = {roc_auc:0.2f})'  , linewidth = 5)
+plt.plot(fpr, tpr, label=f'NAD(P)H variables (ROC AUC = {roc_auc:0.2f})'  , linewidth = 5) # + Cell Size
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################### Top 4 (NADH a1, Norm RR, NADH tm, NADH t2)
@@ -216,7 +216,7 @@ clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy,  op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
 
 # Plot of a ROC curve for a specific class
-plt.plot(fpr, tpr, label=f'Norm. Redox Ratio + Cell Size (ROC AUC) = {roc_auc:0.2f})'  , linewidth = 5)
+plt.plot(fpr, tpr, label=f'Norm. Redox Ratio (ROC AUC) = {roc_auc:0.2f})'  , linewidth = 5) # + Cell Size
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 plt.xlim([0.0, 1.0])

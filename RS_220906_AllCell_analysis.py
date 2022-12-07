@@ -201,7 +201,7 @@ fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test,
 # dict_accuracies['nadh_and_cell_size'] = accuracy
 
 # Plot of a ROC curve for a specific class
-plt.plot(fpr, tpr, label='NAD(P)H variables + Cell Size (ROC AUC = %0.2f)' % roc_auc, linewidth = 5)
+plt.plot(fpr, tpr, label='NAD(P)H variables (ROC AUC = %0.2f)' % roc_auc, linewidth = 5) # + Cell Size 
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################## Top 4 (NADH a1, Norm RR, Cell Size, NADH t1) ####################################### 4
@@ -276,7 +276,7 @@ fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test,
 # dict_accuracies['redox_cell_size'] = accuracy
 
 # Plot of a ROC curve for a specific class
-plt.plot(fpr, tpr, label='Norm. Redox Ratio + Cell Size (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5)
+plt.plot(fpr, tpr, label='Norm. Redox Ratio (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5) #  + Cell Size 
 plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 
@@ -1052,15 +1052,15 @@ print('All cell data cell type + activation classifier')
 
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] #, 'Cell_Size_Pix'
 
-# # # ## Figure 5 F
+# # # # ## Figure 5 F
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
-# # # # # ##### Top variables
+# # # # # # ##### Top variables
 # list_omi_parameters = ['NADH_a1']
 # list_omi_parameters = ['NADH_a1', 'NADH_t1']
-# list_omi_parameters = ['NADH_a1', 'NADH_t1',] # , 'Cell_Size_Pix'
-# list_omi_parameters = ['NADH_a1', 'NADH_t1', 'NADH_tm'] # , 'Cell_Size_Pix'
-# # # # # # ##### Top variables
+# list_omi_parameters = ['NADH_a1', 'NADH_t1','NADH_tm'] # , 'Cell_Size_Pix'
+# list_omi_parameters = ['NADH_a1', 'NADH_t1', 'NADH_tm', 'FAD_tm'] # , 'Cell_Size_Pix'
+# # # # # # # ##### Top variables
 
 
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] # , 'Cell_Size_Pix'
