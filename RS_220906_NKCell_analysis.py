@@ -114,8 +114,10 @@ dict_classes = {label_int : label_class for label_int, label_class in enumerate(
 
 #%% Section 3 - Generate graph with all ROCs
 
-#TODO F4
+#TODO F4 D and C
 list_top_vars = []
+
+dict_accuracies = {}
 
 # plot colors 
 colors = ['#fde725', '#a5db36', '#4ac16d','#1f988b','#2a788e','#414487', '#440154']
@@ -127,6 +129,7 @@ X_train1, X_test1, y_train1, y_test1 = _train_test_split(nk_df, list_cols, class
 ##%%  ################### 10 features 
 clf = RandomForestClassifier(random_state=0).fit(X_train1, y_train1)
 fpr, tpr, roc_auc, accuracy, op_point = run_analysis_on_classifier(clf, X_test1, y_test1, dict_classes)
+dict_accuracies["all features"] = accuracy
 
 ### Figure 4 C
 print("F4_C piechart of importance on all features")
@@ -145,6 +148,9 @@ list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] # , 'Cell_Size_Pix'
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+dict_accuracies["NADH features"] = accuracy
+
+
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'NAD(P)H variables (ROC AUC = {roc_auc:0.2f})'  , linewidth = 5) # + Cell Size
@@ -159,6 +165,8 @@ list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+dict_accuracies["top 4"] = accuracy
+
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'Top four variables (ROC AUC) = {roc_auc:0.2f})' , linewidth = 5)
@@ -174,6 +182,8 @@ list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+dict_accuracies["top 3"] = accuracy
+
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'Top three variables (ROC AUC) = {roc_auc:0.2f})' , linewidth = 5)
@@ -189,6 +199,8 @@ list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy,  op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+dict_accuracies["top 2"] = accuracy
+
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'Top two variables (ROC AUC) = {roc_auc:0.2f})', linewidth = 5)
@@ -203,6 +215,9 @@ list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
 X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy,  op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+dict_accuracies["top 1"] = accuracy
+
+
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label=f'Top variable (ROC AUC) = {roc_auc:0.2})', linewidth = 5)
@@ -210,14 +225,16 @@ plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 ##%% ################### Redox + Cell Size
 
-list_cols = [  'Norm_RR'] # 'Cell_Size_Pix',
-X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
-clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
-fpr, tpr, roc_auc, accuracy,  op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+# list_cols = ['Norm_RR'] # 'Cell_Size_Pix',
+# X_train, X_test, y_train, y_test = _train_test_split(nk_df, list_cols, classes)
+# clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
+# fpr, tpr, roc_auc, accuracy,  op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
+# dict_accuracies["Norm_RR"] = accuracy
 
-# Plot of a ROC curve for a specific class
-plt.plot(fpr, tpr, label=f'Norm. Redox Ratio (ROC AUC) = {roc_auc:0.2f})'  , linewidth = 5) # + Cell Size
-plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
+
+# # Plot of a ROC curve for a specific class
+# plt.plot(fpr, tpr, label=f'Norm. Redox Ratio (ROC AUC) = {roc_auc:0.2f})'  , linewidth = 5) # + Cell Size
+# plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 plt.xlim([0.0, 1.0])
 plt.ylim([0.0, 1.0])
@@ -232,6 +249,9 @@ plt.savefig('./figures/nk/F4_D_RS_nk_ROC.svg',dpi=350, bbox_inches='tight')
 plt.show()
 
 pprint(list_top_vars)
+
+print("--- F4 D Accuracies --- ")
+pprint(dict_accuracies)
 
 
 #%% Section 4 - donor color coding boxplots: Red/blue, all dots visible

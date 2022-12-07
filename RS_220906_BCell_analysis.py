@@ -129,7 +129,7 @@ list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] # , 'Cell_Size_Pix'
 X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
-dict_accuracies['nadh_and_cell_size'] = accuracy
+dict_accuracies['nadh_features'] = accuracy
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label='NAD(P)H variables (ROC AUC = %0.2f)' % roc_auc, linewidth = 5) # + Cell Size
@@ -197,7 +197,7 @@ X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes
 
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
-dict_accuracies['redox_cell_size'] = accuracy
+dict_accuracies['redox'] = accuracy
 
 # Plot of a ROC curve for a specific class
 plt.plot(fpr, tpr, label='Norm. Redox Ratio (ROC AUC) = %0.2f)' % roc_auc, linewidth = 5) #  + Cell Size 
@@ -214,7 +214,7 @@ plt.legend(bbox_to_anchor=(-0.1,-0.1), loc="upper left", fontsize = 36)
 plt.savefig('./figures/b/F2_C_RS_bcell_ROC.svg',dpi=350, bbox_inches='tight')
 plt.show()
 
-print("B Cell Accuracies - Random Forest")
+print("F2 D : B Cell Accuracies - Random Forest")
 pprint(dict_accuracies)
  #%% Section 5 - Box-and-whisker/swarm plots with red and blue color coding
 
