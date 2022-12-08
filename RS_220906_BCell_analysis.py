@@ -111,12 +111,15 @@ X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes
 
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
-dict_accuracies['Top_10'] = accuracy
+dict_accuracies['all features'] = accuracy
 
 ### Figure 4 C
 print("F2_C piechart of importance on all features")
 forest_importances = pd.Series(clf.feature_importances_*100, index=X_train.keys()).sort_values(ascending=False)
 print(forest_importances)
+
+df_acc = pd.DataFrame(forest_importances)
+df_acc.to_csv('./figures/F2/F2_C_feature_importances.csv')
 
 # Plot of a ROC curve for a specific class
 plt.figure()
@@ -211,11 +214,14 @@ plt.xticks(fontsize = 36)
 plt.yticks(fontsize = 36)
 plt.title('Figure 2. Bcells', fontsize = 36)
 plt.legend(bbox_to_anchor=(-0.1,-0.1), loc="upper left", fontsize = 36)
-plt.savefig('./figures/b/F2_C_RS_bcell_ROC.svg',dpi=350, bbox_inches='tight')
+plt.savefig('./figures/F2/F2_C_RS_bcell_ROC.svg',dpi=350, bbox_inches='tight')
 plt.show()
 
 print("F2 D : B Cell Accuracies - Random Forest")
 pprint(dict_accuracies)
+df_acc = pd.DataFrame(dict_accuracies, index=[0])
+df_acc.to_csv('./figures/F2/F2_D_accuracies.csv')
+
  #%% Section 5 - Box-and-whisker/swarm plots with red and blue color coding
 
 df = bcell_df.copy()
@@ -281,7 +287,7 @@ plt.tight_layout()
 plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=5, c=col)
 plt.text((x1+x2)*.5, y+h, "****", ha='center', va='bottom', color=col, size = 40)
 
-plt.savefig('./figures/b/bcell_rr.svg',dpi=350)
+# plt.savefig('./figures/b/bcell_rr.svg',dpi=350)
 
 
 #%% Section 6 - ROC curves: Random forest, Logistic Regression, SVM 
@@ -334,7 +340,7 @@ plt.xticks(fontsize = 36)
 plt.yticks(fontsize = 36)
 plt.title(f'SF2. B Cells | class_weight: {class_weight}', fontsize = 36)
 plt.legend(bbox_to_anchor=(-0.1,-0.1), loc="upper left", fontsize = 36)
-plt.savefig('./figures/b/SF2_RS_bcell_SVMLR_ROC.svg',dpi=350, bbox_inches='tight')
+plt.savefig('./figures/SF2/SF2_RS_bcell_SVMLR_ROC.svg',dpi=350, bbox_inches='tight')
 
 plt.show()
 
@@ -408,7 +414,7 @@ overlay.opts(
 #Saves an interactive holoviews plot as a .HTML file
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/b/F2_B_BCell_ActStatus_umap.svg')
+export_svgs(plot, filename = './figures/F2/F2_B_BCell_ActStatus_umap.svg')
 # hv.save(overlay, 'BCell_ActStatus_umap.html')
 
 
@@ -480,7 +486,7 @@ overlay.opts(
 #saves UMAP as interactive HMTL
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/b/NF_BCell_Donor_umap.svg')
+# export_svgs(plot, filename = './figures/b/NF_BCell_Donor_umap.svg')
 # hv.save(overlay, 'BCell_Donor_umap.html')
 
 
@@ -553,7 +559,7 @@ overlay.opts(
 
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/b/SF2_B_BCell_Donor_ActStatus_umap.svg')
+export_svgs(plot, filename = './figures/SF2/SF2_B_BCell_Donor_ActStatus_umap.svg')
 # hv.save(overlay, 'BCell_Donor_ActStatus_umap.html')
 
 
@@ -634,7 +640,7 @@ overlay.opts(
 
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/b/SF2_A_BCell_ActStatus_Condition_umap.svg')
+export_svgs(plot, filename = './figures/SF2/SF2_A_BCell_ActStatus_Condition_umap.svg')
 
 # hv.save(overlay, 'BCell_ActStatus_Condition_umap.html')
 

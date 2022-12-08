@@ -135,6 +135,8 @@ dict_accuracies["all features"] = accuracy
 print("F4_C piechart of importance on all features")
 forest_importances = pd.Series(clf.feature_importances_*100, index=X_train1.keys()).sort_values(ascending=False)
 print(forest_importances)
+df_acc = pd.DataFrame(forest_importances)
+df_acc.to_csv('./figures/F4/F4_C_feature_importances.csv')
 
 ## %%
 # Plot of a ROC curve for a specific class
@@ -244,7 +246,7 @@ plt.xticks(fontsize = 36)
 plt.yticks(fontsize = 36)
 plt.title('Figure 4. NK Cells', fontsize = 36)
 plt.legend(bbox_to_anchor=(-0.1,-0.1), loc="upper left", fontsize = 36)
-plt.savefig('./figures/nk/F4_D_RS_nk_ROC.svg',dpi=350, bbox_inches='tight')
+plt.savefig('./figures/F4/F4_D_RS_nk_ROC.svg',dpi=350, bbox_inches='tight')
 
 plt.show()
 
@@ -252,6 +254,9 @@ pprint(list_top_vars)
 
 print("--- F4 D Accuracies --- ")
 pprint(dict_accuracies)
+df_acc = pd.DataFrame(dict_accuracies, index=[0])
+df_acc.to_csv('./figures/F4/F4_D_accuracies.csv')
+
 
 
 #%% Section 4 - donor color coding boxplots: Red/blue, all dots visible
@@ -359,7 +364,7 @@ for fig_letter, fig_dict in dict_figures.items():
     plt.plot([x1, x1, x2, x2], [y, y+h, y+h, y], lw=5, c=col)
     plt.text((x1+x2)*.5, y+h, "****", ha='center', va='bottom', color=col, size = 40)
     
-    plt.savefig(f'./figures/nk/F3_{fig_letter}_RS_nk_{fig_dict["y_axis_col_name"]}.svg',dpi=350, bbox_inches='tight')
+    plt.savefig(f'./figures/F3/F3_{fig_letter}_RS_nk_{fig_dict["y_axis_col_name"]}.svg',dpi=350, bbox_inches='tight')
 
 
 
@@ -428,7 +433,7 @@ plt.xticks(fontsize = 36)
 plt.yticks(fontsize = 36)
 plt.title(f'NK Cells | class_weight: {class_weight}', fontsize = 36)
 plt.legend(bbox_to_anchor=(-0.1,-0.1), loc="upper left", fontsize = 36)
-plt.savefig('./figures/nk/SF4_F_RS_nk_SVMLR_ROC.svg',dpi=350, bbox_inches='tight')
+plt.savefig('./figures/SF4/SF4_F_RS_nk_SVMLR_ROC.svg',dpi=350, bbox_inches='tight')
 
 plt.show()
 
@@ -503,7 +508,7 @@ overlay.opts(
 #Saves an interactive holoviews plot as a .HTML file
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/nk/F4_B_NKCell_ActStatus_umap.svg')
+export_svgs(plot, filename = './figures/F4/F4_B_NKCell_ActStatus_umap.svg')
 # hv.save(overlay, 'NKCell_ActStatus_umap.html')
 
 #%% Section 7 -  Nk cell donor UMAP
@@ -573,8 +578,8 @@ overlay.opts(
 
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/nk/NF_NKCell_Donor_umap.svg')
-hv.save(overlay, './figures/NKCell_Donor_umap.html')
+# export_svgs(plot, filename = './figures/nk/NF_NKCell_Donor_umap.svg')
+# hv.save(overlay, './figures/NKCell_Donor_umap.html')
 
 
 #%% Section 8 - Nk cell donor + activation UMAP
@@ -648,7 +653,7 @@ overlay.opts(
 
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/nk/SF4_B_NKCell_Donor_ActStatus_umap.svg')
+export_svgs(plot, filename = './figures/SF4/SF4_B_NKCell_Donor_ActStatus_umap.svg')
 # hv.save(overlay, './figures/nk/SF4_B_NKCell_Donor_ActStatus_umap.html')
 
 #%% Section 9 - UMAP of both groups and activation statuses of NK cells
@@ -742,7 +747,7 @@ overlay.opts(
 
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/nk/SF4_A_NKCell_ActStatus_Condition_umap.svg')
+export_svgs(plot, filename = './figures/SF4/SF4_A_NKCell_ActStatus_Condition_umap.svg')
 
 # hv.save(overlay, './figures/nk/SF4_A_NKCell_ActStatus_Condition_umap.html')
  

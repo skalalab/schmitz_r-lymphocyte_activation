@@ -162,6 +162,8 @@ print(all_df.groupby(by=['Cell_Type','Donor','Activation'])['Norm_RR'].mean())
 
 # SF5 B accuracies 
 
+# SF5_C importances
+
 print('All cell activation classifier')
 
 #Generate df with only the OMI variables we want to include in the classifier (***Always keep Activation column last)
@@ -176,7 +178,6 @@ list_top_vars = []
 
 dict_accuracies = {}
 
-
 ##%% ################## 10 features
 
 list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] #, 'Cell_Size_Pix'
@@ -187,9 +188,12 @@ clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
 dict_accuracies['all feautres'] = accuracy
 
-print("Figure 5D piechart of importance on all features")
+print("SF5_C piechart of importance on all features")
 forest_importances = pd.Series(clf.feature_importances_*100, index=X_train.keys()).sort_values(ascending=False)
+
 print(forest_importances)
+df_acc = pd.DataFrame(forest_importances)
+df_acc.to_csv('./figures/SF5/SF5_C_feature_importances.csv')
 
 
 # Plot of a ROC curve for a specific class
@@ -295,13 +299,17 @@ plt.xticks(fontsize = 36)
 plt.yticks(fontsize = 36)
 plt.title('Figure 5. ALL Cells', fontsize = 36)
 plt.legend(bbox_to_anchor=(-0.1,-0.1), loc="upper left", fontsize = 36)
-plt.savefig('./figures/all/F5_D_RS_allcell_ROC.svg',dpi=350, bbox_inches='tight')
+plt.savefig('./figures/F5/F5_D_RS_allcell_ROC.svg',dpi=350, bbox_inches='tight')
 plt.show()
 
 pprint(list_top_vars)
 print('*' * 20)
 print("SF 5 B : all cell activation accuracies")
 pprint(dict_accuracies)
+
+df_acc = pd.DataFrame(dict_accuracies, index=[0])
+df_acc.to_csv('./figures/SF5/SF5_B_accuracies.csv')
+
 
 #%% Section 5 - All cell activation classifier - Random forest, Logistic, SVM ROCs - Plot all curves together
 
@@ -355,7 +363,7 @@ plt.xticks(fontsize = 36)
 plt.yticks(fontsize = 36)
 plt.title(f'All Cells | | class_weight: {class_weight}', fontsize = 36)
 plt.legend(bbox_to_anchor=(-0.1,-0.1), loc="upper left", fontsize = 36)
-plt.savefig('./figures/all/SF5_D_RS_allcell_SVMLR_ROC.svg',dpi=350, bbox_inches='tight')
+plt.savefig('./figures/SF5/SF5_D_RS_allcell_SVMLR_ROC.svg',dpi=350, bbox_inches='tight')
 
 plt.show()
 
@@ -430,7 +438,7 @@ overlay.opts(
 #Saves an interactive holoviews plot as a .HTML file
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/all/SF5_A_AllCell_ActStatus_umap.svg')
+export_svgs(plot, filename = './figures/SF5/SF5_A_AllCell_ActStatus_umap.svg')
 # hv.save(overlay, './figures/AllCell_ActStatus_umap.svg')
 
 #%% Section 7 - UMAP of cell type
@@ -501,7 +509,7 @@ overlay.opts(
 
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/all/SF6_A_AllCell_CellType_umap.svg')
+export_svgs(plot, filename = './figures/SF6/SF6_A_AllCell_CellType_umap.svg')
 # hv.save(overlay, 'AllCell_CellType_umap.svg')
 
 #%% Setion 8 - UMAP of cell type (QUIESCENT ONLY)
@@ -571,7 +579,7 @@ overlay.opts(
 
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/all/SF7_A_AllCell_CellType_QuiOnly_umap.svg')
+export_svgs(plot, filename = './figures/SF7/SF7_A_AllCell_CellType_QuiOnly_umap.svg')
 # hv.save(overlay, 'AllCell_CellType_QuiOnly_umap.svg')
 
 #%% Section 9 - UMAP of cell type + activation status
@@ -641,7 +649,7 @@ overlay.opts(
 
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/all/F5_C_AllCell_CellType_ActStatus_umap.svg')
+export_svgs(plot, filename = './figures/F5/F5_C_AllCell_CellType_ActStatus_umap.svg')
 # hv.save(overlay, 'AllCell_CellType_ActStatus_umap.svg')
 
 
@@ -715,7 +723,7 @@ overlay.opts(
 
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/all/NF_AllCell_CellType_Donor_umap.svg')
+# export_svgs(plot, filename = './figures/all/NF_AllCell_CellType_Donor_umap.svg')
 # hv.save(overlay, 'AllCell_CellType_Donor_umap.svg')
 #%% Section 11 - UMAP of activation status color-coded by donor
 
@@ -783,7 +791,7 @@ overlay.opts(
 
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-export_svgs(plot, filename = './figures/all/SF8_A_AllCell_CellType_Donor_ActStatus_umap.svg')
+export_svgs(plot, filename = './figures/SF8/SF8_A_AllCell_CellType_Donor_ActStatus_umap.svg')
 
 # hv.save(overlay, "figures/" 'AllCell_CellType_Donor_ActStatus_umap.svg')
 
@@ -970,11 +978,14 @@ print("SF6_C   | T B and NK cells")
 cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'])
 print(cm_table)
 
-print("+"*20)
-print("Figure SF6_C piechart of importance on all features")
-forest_importances = pd.Series(clf.feature_importances_*100, index=list_omi_parameters).sort_values(ascending=False)
-print(forest_importances)
-print("+"*20)
+if len(list_omi_parameters) == 9:
+    print("+" * 20)
+    print("Figure SF6_C piechart of importance on all features")
+    forest_importances = pd.Series(clf.feature_importances_*100, index=list_omi_parameters).sort_values(ascending=False)
+    print(forest_importances)
+    df_acc = pd.DataFrame(forest_importances)
+    df_acc.to_csv('./figures/SF6/SF6_C_importances.csv')
+    print("+" * 20)
 
 #Print metrics for classifier assessment
 print('Accuracy score =', accuracy_score(y_test, y_pred))
@@ -1031,11 +1042,15 @@ reversefactor = dict(zip(range(len(classes)), definitions))
 y_test = np.vectorize(reversefactor.get)(y_test)
 y_pred = np.vectorize(reversefactor.get)(y_pred)
 
-print("+"*20)
-print("Figure SF7_C piechart of importance on all features")
-forest_importances = pd.Series(clf.feature_importances_*100, index=list_omi_parameters).sort_values(ascending=False)
-print(forest_importances)
-print("+"*20)
+if len(list_omi_parameters) == 9:
+    print("+"*20)
+    print("Figure SF7_C piechart of importance on all features")
+    forest_importances = pd.Series(clf.feature_importances_*100, index=list_omi_parameters).sort_values(ascending=False)
+    print(forest_importances)
+    df_imp = pd.DataFrame(forest_importances)
+    df_imp.to_csv('./figures/SF7/SF7_C_feature_importances.csv')
+    print("+"*20)
+
 
 print("SF7_D Quiescent")
 # cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
@@ -1043,6 +1058,9 @@ print("SF7_D Quiescent")
 print("-"*20)
 cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'])
 print(cm_table)
+
+df_acc = pd.DataFrame(cm_table)
+df_acc.to_csv('./figures/SF7/SF7_D_quiescent_confusion_matrix.csv')
 
 # for col, feature in zip(np.flip(all_df_edit.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
 #     print(col, clf.feature_importances_[feature])
@@ -1115,11 +1133,19 @@ forest_importances = pd.Series(clf.feature_importances_*100, index=list_omi_para
 print(forest_importances)
 print("+"*20)
 
+df_acc = pd.DataFrame(dict_accuracies, index=[0])
+df_acc.to_csv('./figures/SF8/SF8_B_feature_importances.csv')
+
 print("SF8_C")
 # cm_table1 = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
 # print(cm_table1)
 print("-" * 30)
 cm_table2 = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'])
+
+
+df_acc = pd.DataFrame(cm_table2)
+df_acc.to_csv('./figures/SF8/SF8_C_confusion_matrix.csv')
+
 print(cm_table2)
 # for col, feature in zip(np.flip(all_df_edit.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
 #     print(col, clf.feature_importances_[feature])
