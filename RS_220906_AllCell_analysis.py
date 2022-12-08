@@ -155,6 +155,9 @@ print("*" * 20)
 print(all_df.groupby(by=['Cell_Type','Donor','Activation'])['Norm_RR'].mean())
 
 
+all_df.to_csv("./figures/all_data_including_new_nk_normalized_donor.csv")
+
+
 
 #%% Section 4 - All cell activation classifier ROCs - Plot all curves together 
 
