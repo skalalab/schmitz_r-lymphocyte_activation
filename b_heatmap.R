@@ -15,7 +15,7 @@ library(circlize)
 labCol_test <- c("Norm RR", expression(paste("NAD(P)H ",tau[m])),expression(paste("FAD ",tau[m])), "Cell Size", expression(paste("NAD(P)H ",alpha[1])), expression(paste("NAD(P)H ",tau[1])), expression(paste("NAD(P)H ",tau[2])),expression(paste("FAD ",alpha[1])), expression(paste("FAD ",tau[1])), expression(paste("FAD ",tau[2])))
 
 #Read in single cell B-cell data
-mydata <- read.csv("Z:/Rebecca/Immune Cell Projects/Lymphocyte Paper/Paper data/B-cells (Donors 1-3)/B_heatmap.csv", header=T)
+mydata <- read.csv("./Heatmaps (R)/B_heatmap.csv", header=T)
 all_data <- mydata
 
 #Calculate mean and sd of each OMI variable in CD69- control cells to use for calculating Z-scores

@@ -1,0 +1,37 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Dec 14 11:54:52 2022
+
+@author: nabiki
+"""
+
+from pathlib import Path
+import pandas as pd
+
+path_data = Path(r"./Data files/ecg_feature_exports/20221214_all_data_including_new_nk_normalized_donor.csv")
+
+df = pd.read_csv(path_data)
+
+list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
+
+
+df.groupby(["Cell_Type",'Activation']).count()
+
+#%% B Cells
+
+
+df_b_cells = df[df['Cell_Type'] == 'B-Cells'][list_omi_parameters + ['Activation' , 'Donor']]
+
+df_b_cells['Activation'] = df_b_cells['Activation'].map({'CD69-':0, 'CD69+':1})
+
+dict_donors = {donor:idx for idx, donor in enumerate(df_b_cells['Donor'].unique(), start=1)}
+df_b_cells['Donor'] = df_b_cells['Donor'].map(dict_donors)
+
+df_b_cells.to_csv(path_data.parent / "B_cells.csv")
+
+
+#%% NK Cells
+
+
+#%% All Cells

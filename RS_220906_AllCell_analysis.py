@@ -44,6 +44,9 @@ plt.rcParams['svg.fonttype'] = 'none'
 
 from helper import run_analysis_on_classifier, _train_test_split
 
+from datetime import date 
+date_today = date.today()
+
 #%% Section 2 - Define ROC function
 
 
@@ -155,7 +158,8 @@ print("*" * 20)
 print(all_df.groupby(by=['Cell_Type','Donor','Activation'])['Norm_RR'].mean())
 
 
-all_df.to_csv("./figures/all_data_including_new_nk_normalized_donor.csv")
+d = str(date_today.year) + str(date_today.month) + str(date_today.day)
+all_df.to_csv(f"./Data files/ecg_feature_exports/{d}_all_data_including_new_nk_normalized_donor.csv", index=False)
 
 
 
