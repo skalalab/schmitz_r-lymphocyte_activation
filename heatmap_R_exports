@@ -43,5 +43,42 @@ df_b_cells.to_csv(path_data.parent / "B_cells.csv", index=False)
 
 #%% NK Cells
 
+df_nk_cells = df[df['Cell_Type'] == 'NK-Cells'][list_omi_parameters + ['Activation' , 'Donor']]
 
-#%% All Cells
+df_nk_cells['Activation'] = df_nk_cells['Activation'].map({'CD69-':0, 'CD69+':1})
+
+dict_donors = {donor:idx for idx, donor in enumerate(df_nk_cells['Donor'].unique(), start=4)}
+df_nk_cells['Donor'] = df_nk_cells['Donor'].map(dict_donors)
+
+df_nk_cells.to_csv(path_data.parent / "NK_cells.csv", index=False)
+
+
+#%% T Cells
+
+df_t_cells = df[df['Cell_Type'] == 'T-cells'][list_omi_parameters + ['Activation' , 'Donor']]
+
+df_t_cells['Activation'] = df_t_cells['Activation'].map({'CD69-':0, 'CD69+':1})
+
+dict_donors = {donor:idx for idx, donor in enumerate(df_t_cells['Donor'].unique(), start=7)}
+df_t_cells['Donor'] = df_t_cells['Donor'].map(dict_donors)
+
+df_t_cells.to_csv(path_data.parent / "T_cells.csv", index=False)
+
+#%% Combine DF for all cells 
+
+cell_type_id = {"B-cells": 0,
+ "NK-cells" : 1,
+ "T-cells" : 3
+ }
+df_b_cells['Cell_Type'] = cell_type_id["B-cells"]
+df_nk_cells['Cell_Type'] = cell_type_id["NK-cells"]
+df_t_cells['Cell_Type'] = cell_type_id["T-cells"]
+
+df_all_data = pd.concat([df_b_cells, df_nk_cells, df_t_cells])
+
+
+df_all_data.to_csv(path_data.parent / "all_data.csv", index=False)
+
+
+
+
