@@ -13,10 +13,19 @@ library(circlize)
 
 
 #Make sure order of columns in CSV matches order in this list
-labCol_test <- c("Norm RR", expression(paste("NAD(P)H ",tau[m])),expression(paste("FAD ",tau[m])), "Cell Size", expression(paste("NAD(P)H ",alpha[1])), expression(paste("NAD(P)H ",tau[1])), expression(paste("NAD(P)H ",tau[2])),expression(paste("FAD ",alpha[1])), expression(paste("FAD ",tau[1])), expression(paste("FAD ",tau[2])))
+labCol_test <- c("Norm RR", 
+                 expression(paste("NAD(P)H ",tau[m])),
+                 expression(paste("FAD ",tau[m])),
+                 expression(paste("NAD(P)H ",alpha[1])),
+                 expression(paste("NAD(P)H ",tau[1])), 
+                 expression(paste("NAD(P)H ",tau[2])),
+                 expression(paste("FAD ",alpha[1])),
+                 expression(paste("FAD ",tau[1])),
+                 expression(paste("FAD ",tau[2])))
 
 #Read in single cell NK cell data
-mydata <- read.csv("Z:/Rebecca/Immune Cell Projects/Lymphocyte Paper/Paper data/NK cells (Donors 4-6)/NK_heatmap.csv", header=T)
+# mydata <- read.csv("Z:/Rebecca/Immune Cell Projects/Lymphocyte Paper/Paper data/NK cells (Donors 4-6)/NK_heatmap.csv", header=T)
+mydata <- read.csv("./Data files/ecg_feature_exports/NK_cells.csv", header=T)
 all_mean <- mydata
 
 #Calculate mean and sd of each OMI variable in CD69- control cells to use for calculating Z-scores
@@ -25,7 +34,7 @@ control_sd <- subset(aggregate(all_mean, list(all_mean$Activation), sd),Group.1=
 cn<- c("Norm_RR", "Na1", "Ntm", "Nt2", "Ft1","Ftm","Ft2","Nt1","Fa1")
 
 #Calculated Z-score for each OMI variable vs. mean of control cells (single cell level)
-all_mean_s <- as.matrix(scale(all_mean[, c(1:10)], center=as.matrix(control_mean[, c(2:11)]), scale = as.matrix(control_sd[, c(2:11)])))
+all_mean_s <- as.matrix(scale(all_mean[, c(1:9)], center=as.matrix(control_mean[, c(2:10)]), scale = as.matrix(control_sd[, c(2:10)])))
 row_col <- cbind(all_mean$Activation, all_mean$Donor)
 colnames(row_col) <- c('Activation', 'Donor')
 all_mean2 <- cbind(data.frame(all_mean_s),row_col)

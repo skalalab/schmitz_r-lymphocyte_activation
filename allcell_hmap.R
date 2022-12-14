@@ -13,10 +13,20 @@ library(circlize)
 
 
 #Make sure orders of columns on CSV match order of these labels
-labCol_test <- c("Norm RR", expression(paste("NAD(P)H ",tau[m])),expression(paste("FAD ",tau[m])), "Cell Size", expression(paste("NAD(P)H ",alpha[1])), expression(paste("NAD(P)H ",tau[1])), expression(paste("NAD(P)H ",tau[2])),expression(paste("FAD ",alpha[1])), expression(paste("FAD ",tau[1])), expression(paste("FAD ",tau[2])))
+labCol_test <- c("Norm RR",
+                 expression(paste("NAD(P)H ",tau[m])),
+                 expression(paste("FAD ",tau[m])),
+                 expression(paste("NAD(P)H ",alpha[1])),
+                 expression(paste("NAD(P)H ",tau[1])),
+                 expression(paste("NAD(P)H ",tau[2])),
+                 expression(paste("FAD ",alpha[1])), 
+                 expression(paste("FAD ",tau[1])), 
+                 expression(paste("FAD ",tau[2])))
 
 #reads in organized data
-mydata <- read.csv("Z:/Rebecca/Immune Cell Projects/Lymphocyte Paper/Paper data/AllCellData_hmap.csv", header=T)
+# mydata <- read.csv("Z:/Rebecca/Immune Cell Projects/Lymphocyte Paper/Paper data/AllCellData_hmap.csv", header=T)
+mydata <- read.csv("./Data files/ecg_feature_exports/all_data.csv", header=T)
+
 all_cell <- mydata
 #computes means for each group within donor
 all_cell_mean <- aggregate(all_cell, list(all_cell$Donor,
@@ -27,12 +37,12 @@ control_mean <- subset(aggregate(all_cell, list(all_cell$Activation), mean),Grou
 
 #Calculate z-scores vs. the CD69- control mean
 all_mean <- rbind(all_cell_mean)
-all_mean_s <- as.matrix(scale(all_mean[, c(4:13)], center=as.matrix(control_mean[, c(2:11)]), scale=as.matrix(control_sd[, c(2:11)])))
+all_mean_s <- as.matrix(scale(all_mean[, c(1:9)], center=as.matrix(control_mean[, c(2:10)]), scale=as.matrix(control_sd[, c(2:10)])))
 
 #Dendrogram -- hierarchical clustering of groups (rows) and OMi variables (columns)
 col.hc <- hclust(dist(t(all_mean_s)), method="ward.D2")
 col.dd <- as.dendrogram(col.hc)
-weights.dd <- c(500, 10, 100, 10000, 1000, 1, 1, 10, 10, 10)
+weights.dd <- c(500, 10, 100, 1000, 1, 1, 10, 10, 10) # 10000 cell size weight 4th place from left
 col.dd.reordered1 <- reorder(col.dd,wts = weights.dd,agglo.FUN = mean)
 col_palette2 <- colorRamp2(c(-3,0,3), c("cyan", "black", "magenta"))
 row.hc <- hclust(dist(all_mean_s), method = "ward.D2")
