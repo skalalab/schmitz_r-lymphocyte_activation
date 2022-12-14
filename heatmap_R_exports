@@ -13,7 +13,17 @@ path_data = Path(r"./Data files/ecg_feature_exports/20221214_all_data_including_
 
 df = pd.read_csv(path_data)
 
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
+list_omi_parameters = [
+                       'Norm_RR',
+                       'NADH_tm', 
+                       'FAD_tm', 
+                       'NADH_a1', 
+                       'NADH_t1', 
+                       'NADH_t2', 
+                       'FAD_a1', 
+                       'FAD_t1', 
+                       'FAD_t2', 
+                       ] # , 'Cell_Size_Pix'
 
 
 df.groupby(["Cell_Type",'Activation']).count()
@@ -28,7 +38,7 @@ df_b_cells['Activation'] = df_b_cells['Activation'].map({'CD69-':0, 'CD69+':1})
 dict_donors = {donor:idx for idx, donor in enumerate(df_b_cells['Donor'].unique(), start=1)}
 df_b_cells['Donor'] = df_b_cells['Donor'].map(dict_donors)
 
-df_b_cells.to_csv(path_data.parent / "B_cells.csv")
+df_b_cells.to_csv(path_data.parent / "B_cells.csv", index=False)
 
 
 #%% NK Cells
