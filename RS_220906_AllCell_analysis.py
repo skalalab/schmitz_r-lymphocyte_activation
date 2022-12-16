@@ -1096,7 +1096,6 @@ list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FA
 # list_omi_parameters = ['NADH_a1', 'NADH_t1', 'NADH_tm', 'FAD_tm'] # , 'Cell_Size_Pix'
 # # # # # # # ##### Top variables
 
-
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] # , 'Cell_Size_Pix'
 # list_omi_parameters = ['Norm_RR'] # , 'Cell_Size_Pix'
 
@@ -1140,7 +1139,7 @@ forest_importances = pd.Series(clf.feature_importances_*100, index=list_omi_para
 print(forest_importances)
 print("+"*20)
 
-df_acc = pd.DataFrame(dict_accuracies, index=[0])
+df_acc = pd.DataFrame(forest_importances, index=[0])
 df_acc.to_csv('./figures/SF8/SF8_B_feature_importances.csv')
 
 print("SF8_C")
@@ -1159,4 +1158,5 @@ print(cm_table2)
 
 print('Accuracy score =', accuracy_score(y_test, y_pred))
 # print(classification_report(y_test,y_pred))
+
 
