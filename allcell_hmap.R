@@ -37,7 +37,7 @@ control_mean <- subset(aggregate(all_cell, list(all_cell$Activation), mean),Grou
 
 #Calculate z-scores vs. the CD69- control mean
 all_mean <- rbind(all_cell_mean)
-all_mean_s <- as.matrix(scale(all_mean[, c(1:9)], center=as.matrix(control_mean[, c(2:10)]), scale=as.matrix(control_sd[, c(2:10)])))
+all_mean_s <- as.matrix(scale(all_mean[, c(4:12)], center=as.matrix(control_mean[, c(2:10)]), scale=as.matrix(control_sd[, c(2:10)])))
 
 #Dendrogram -- hierarchical clustering of groups (rows) and OMi variables (columns)
 col.hc <- hclust(dist(t(all_mean_s)), method="ward.D2")
