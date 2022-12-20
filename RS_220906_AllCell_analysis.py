@@ -1139,8 +1139,8 @@ forest_importances = pd.Series(clf.feature_importances_*100, index=list_omi_para
 print(forest_importances)
 print("+"*20)
 
-df_acc = pd.DataFrame(forest_importances, index=[0])
-df_acc.to_csv('./figures/SF8/SF8_B_feature_importances.csv')
+# df_acc = pd.DataFrame(forest_importances, index=[0])
+forest_importances.to_csv('./figures/SF8/SF8_B_feature_importances.csv')
 
 print("SF8_C")
 # cm_table1 = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
