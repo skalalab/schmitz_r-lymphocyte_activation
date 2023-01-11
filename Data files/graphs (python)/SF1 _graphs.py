@@ -107,7 +107,7 @@ for y_variable in y_variables:
                                     ("Activated_CD69-","Activated_CD69+"), 
                                     ( "Control_CD69-","Activated_CD69+"),                              
                                     ],
-                        test='Mann-Whitney', 
+                        test='Kruskal', 
                         text_format='star', 
                         loc='outside', 
                         verbose=1)
@@ -128,7 +128,7 @@ for y_variable in y_variables:
     plt.legend([],[], frameon=False)
     
     filename = f"{y_variable}.svg"
-    plt.savefig(os.path.join(path_save, filename), format='svg', dpi=1200, bbox_inches='tight')
+    #plt.savefig(os.path.join(path_save, filename), format='svg', dpi=1200, bbox_inches='tight')
     
     plt.show()
 
