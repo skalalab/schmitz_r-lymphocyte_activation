@@ -18,7 +18,7 @@ import os
 
 #Read in dataframe    
 path_main = Path(r'Z:\Rebecca\lymphocyte data\NK cell repeats')
-path_save = os.path.join(path_main, "SF3")
+path_save = Path(r'C:\Users\jriendeau\Documents\GitHub\schmitz_r-lymphocyte_activation\figures\SF3')
 
 csv_path = path_main / 'NK_donors_final_dec02.csv'
 all_df = pd.read_csv(csv_path)
@@ -132,7 +132,7 @@ for y_variable in y_variables:
     plt.legend([],[], frameon=False)
     
     filename = f"{y_variable}.svg"
-    #plt.savefig(os.path.join(path_save, filename), format='svg', dpi=1200, bbox_inches='tight')
+    plt.savefig(os.path.join(path_save, filename), format='svg', dpi=1200, bbox_inches='tight')
     
     plt.show()
 
