@@ -46,52 +46,61 @@ from helper import run_analysis_on_classifier, _train_test_split
 
 from datetime import date 
 date_today = date.today()
+from pathlib import Path
 
-#%% Section 2 - Define ROC function
-
-
-# def calculate_roc_rf(rf_df, key='Activation'): 
-    
-#     # Need to binarize the problem as a 'One vs. all' style approach for ROC classification
-#     classes = ['CD69-', 'CD69+']
-
-#     #designate train/test data, random forest classifier
-#     X, y = rf_df.iloc[:,:-1], rf_df[[key]]
-#     y = label_binarize(y, classes=classes)
-#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
-#     y_train = np.ravel(y_train)
-#     clf = RandomForestClassifier(random_state=0)
-#     y_score = clf.fit(X_train, y_train).predict_proba(X_test)
-#     y_pred = clf.fit(X_train, y_train).predict(X_test)
-
-
-#     # Compute ROC curve and ROC area for each class
-    
-#     fpr, tpr, _ = roc_curve(y_test, y_score[:, 1])
-#     roc_auc = auc(fpr, tpr)
-    
-#     # Plot of a ROC curve for a specific class
-#     plt.figure()
-#     plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
-#     plt.plot([0, 1], [0, 1], 'k--')
-#     plt.xlim([0.0, 1.0])
-#     plt.ylim([0.0, 1.0])
-#     plt.xlabel('False Positive Rate', fontsize = 20)
-#     plt.ylabel('True Positive Rate', fontsize = 20)
-#     plt.xticks(fontsize = 20)
-#     plt.yticks(fontsize = 20)
-#     plt.title('')
-#     plt.legend(loc="lower right", fontsize = 20)
-#     plt.show()
     
 #%% Section 3 - Read in and set up dataframe 
 
 #Read in dataframe    
 
-all_df = pd.read_csv('./Data files/UMAPs, boxplots, ROC curves (Python)/AllCellData.csv')
+path_datasets = Path(r"./Data files/UMAPs, boxplots, ROC curves (Python)")
+all_df = pd.read_csv(path_datasets / 'AllCellData.csv')
+all_df['count'] = 1
+all_df.groupby(['Cell_Type','Activation'])['count'].count()
 
+#%% Remove and replace T cell data 
 
-##%% # remove old NK donors and add new ones
+df_t_cells_labeled = pd.read_csv(path_datasets / 'CD3Test_CD69labeled.csv')
+df_t_cells_labeled.groupby(by=["Donor",'Activation'])['RR'].mean()
+
+for donor in df_t_cells_labeled['Donor'].unique():
+    pass
+    mean_control_rr = df_t_cells_labeled[(df_t_cells_labeled['Donor'] == donor)&
+                                  (df_t_cells_labeled['Activation']==0)]['RR'].mean()
+    df_t_cells_labeled.loc[df_t_cells_labeled['Donor'] == donor,
+                            'RR'] = (df_t_cells_labeled.loc[df_t_cells_labeled['Donor'] == donor,'RR'] / mean_control_rr)
+
+df_t_cells_labeled.groupby(by=["Donor",'Activation'])['RR'].mean()
+
+## fix labeling of values
+activation_status= {0 : "CD69-", 1: "CD69+"}
+df_t_cells_labeled['Activation'] = df_t_cells_labeled['Activation'].map(activation_status)
+
+donor_label= {2 : "B", 5: "E", 6: "F"}
+df_t_cells_labeled['Donor'] = df_t_cells_labeled['Donor'].map(donor_label)
+
+df_t_cells_labeled['Cell_Type'] = 'T-Cells'
+
+# rename columns 
+df_t_cells_labeled = df_t_cells_labeled.rename(columns={'Nt1' : 'NADH_t1', 
+                                                        'Nt2' : 'NADH_t2', 
+                                                        'Na1' : 'NADH_a1', 
+                                                        'Ntm' : 'NADH_tm', 
+                                                        'Ft1' : 'FAD_t1', 
+                                                        'Ft2' : 'FAD_t2',
+                                                        'Fa1' : 'FAD_a1', 
+                                                        'RR' : 'Norm_RR', 
+                                                        'Ftm' : 'FAD_tm', 
+                                                        })
+
+df_t_cells_labeled.groupby(by=["Donor",'Activation'])['Norm_RR'].mean()
+## END NORMALIZING AND FORMATTING T CELL DATA
+
+# Replace T cell data
+all_df = all_df[all_df['Cell_Type'] != 'T-cells']
+all_df = pd.concat([all_df, df_t_cells_labeled])
+
+#%% Remove old NK donors and add new ones
 all_df = all_df[all_df['Cell_Type'] != 'NK-Cells']
 
 # load new nk cells 
@@ -107,9 +116,6 @@ df_nk = df_nk.rename(columns={'n.t1.mean' : 'NADH_t1',
                               'f.tm.mean' : 'FAD_tm', 
                               'npix' : 'Cell_Size_Pix'
                               })
-
-df_nk.groupby(['Donor','Group', 'Activation'])['Norm_RR'].mean()
-
 
 # normalize NK cells to donor
 for donor in df_nk['Donor'].unique():
@@ -140,6 +146,12 @@ all_df = df_concat
 
 ##%%%
 
+
+print(all_df.groupby(by=['Cell_Type','Group','Activation',])['Cell_Size_Pix'].count())
+print("*" * 20)
+print(all_df.groupby(by=['Cell_Type','Donor','Activation'])['Norm_RR'].mean())
+print(all_df.groupby(by=['Cell_Type','Activation'])['Norm_RR'].count())
+
 #Add combination variables to data set
 all_df.drop(['NADH', 'Group', 'Experiment_Date'], axis=1, inplace=True)
 all_df['Type_Activation'] = all_df['Cell_Type'] + ': ' + all_df['Activation']
@@ -153,14 +165,8 @@ classes = ['CD69-', 'CD69+']
 dict_classes = {label_int : label_class for label_int, label_class in enumerate(classes)}
 
 
-print(all_df.groupby(by=['Cell_Type','Donor','Activation',])['Cell_Size_Pix'].count())
-print("*" * 20)
-print(all_df.groupby(by=['Cell_Type','Donor','Activation'])['Norm_RR'].mean())
-
-
-d = str(date_today.year) + str(date_today.month) + str(date_today.day)
+d = str(date_today.year) + str(date_today.month).zfill(2) + str(date_today.day).zfill(2)
 all_df.to_csv(f"./Data files/ecg_feature_exports/{d}_all_data_including_new_nk_normalized_donor.csv", index=False)
-
 
 
 #%% Section 4 - All cell activation classifier ROCs - Plot all curves together 
@@ -944,7 +950,7 @@ list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FA
 # list_omi_parameters = ['FAD_tm', 'FAD_t1']
 # list_omi_parameters = ['FAD_tm', 'FAD_t1', 'NADH_tm']
 # list_omi_parameters = ['FAD_tm', 'FAD_t1', 'NADH_tm', 'FAD_a1']
-# # # # # # # #####
+# # # # # # # # #####
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] # , 'Cell_Size_Pix'
 # list_omi_parameters = ['Norm_RR', ] #'Cell_Size_Pix'
 # list_omi_parameters = ['NADH_a1']
@@ -1014,7 +1020,7 @@ list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FA
 # list_omi_parameters = ['FAD_tm', 'FAD_t1']
 # list_omi_parameters = ['FAD_tm', 'FAD_t1','NADH_tm']
 # list_omi_parameters = ['FAD_tm', 'FAD_t1','NADH_tm', 'NADH_a1']
-# # # # # # # ##### Top variables
+# # # # # # # # ##### Top variables
 
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] #, 'Cell_Size_Pix'
 # list_omi_parameters = ['Norm_RR'] # , 'Cell_Size_Pix'
@@ -1094,7 +1100,7 @@ list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FA
 # list_omi_parameters = ['NADH_a1', 'NADH_t1']
 # list_omi_parameters = ['NADH_a1', 'NADH_t1','NADH_tm'] # , 'Cell_Size_Pix'
 # list_omi_parameters = ['NADH_a1', 'NADH_t1', 'NADH_tm', 'FAD_tm'] # , 'Cell_Size_Pix'
-# # # # # # # ##### Top variables
+# # # # # # # # ##### Top variables
 
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] # , 'Cell_Size_Pix'
 # list_omi_parameters = ['Norm_RR'] # , 'Cell_Size_Pix'

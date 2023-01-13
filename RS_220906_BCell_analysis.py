@@ -26,8 +26,6 @@ from bokeh.io import export_svgs
 
 from pprint import pprint
 
-# from sklearn.preprocessing import label_binarize
-# from sklearn.model_selection import train_test_split
 
 import holoviews as hv
 hv.extension("bokeh")
@@ -38,40 +36,6 @@ import matplotlib as mpl
 mpl.rcParams['figure.dpi'] = 300
 
 from helper import run_analysis_on_classifier, _train_test_split
-#%% Section 2 - Set-up for ROC curves
-
-
-# def calculate_roc_rf(rf_df, key='Activation'): 
-    
-#     # Need to binarize the problem as a 'One vs. all' style approach for ROC classification
-#     classes = ['CD69-', 'CD69+']
-    
-#     #designate train/test data, random forest classifier
-#     X, y = rf_df.iloc[:,:-1], rf_df[[key]]
-#     y = label_binarize(y, classes=classes)
-#     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
-#     y_train = np.ravel(y_train)
-#     clf = RandomForestClassifier(random_state=0)
-#     y_score = clf.fit(X_train, y_train).predict_proba(X_test)
-#     y_pred = clf.fit(X_train, y_train).predict(X_test)
-
-#     # Compute ROC curve and ROC area for each class
-#     fpr, tpr, _ = roc_curve(y_test, y_score[:, 1])
-#     roc_auc = auc(fpr, tpr)
-    
-#     # Plot of a ROC curve for a specific class
-#     plt.figure()
-#     plt.plot(fpr, tpr, label='ROC curve (area = %0.2f)' % roc_auc)
-#     plt.plot([0, 1], [0, 1], 'k--')
-#     plt.xlim([0.0, 1.0])
-#     plt.ylim([0.0, 1.0])
-#     plt.xlabel('False Positive Rate', fontsize = 20)
-#     plt.ylabel('True Positive Rate', fontsize = 20)
-#     plt.xticks(fontsize = 20)
-#     plt.yticks(fontsize = 20)
-#     plt.title('')
-#     plt.legend(loc="lower right", fontsize = 20)
-#     plt.show()
 
 #%% Section 3 - Read in B-cell data
 
@@ -83,14 +47,13 @@ bcell_df['Act_Donor'] = bcell_df['Activation'] + ' ' + bcell_df['Donor']
 
 bcell_df.groupby(by=['Donor','Group','Activation'])['Cell_Type'].count()
 
-
 df_data = bcell_df.copy()
 
 classes = ['CD69-', 'CD69+']
 dict_classes = {label_int : label_class for label_int, label_class in enumerate(classes)}
 #%% Section 4 - ROC curves for different variable combos plotted together
 
-# TODO  FIGURE 2 
+#   FIGURE 2 
 #B-cell random forest classifiers
 
 sns.set(rc={'figure.figsize': (15, 15)})
@@ -292,7 +255,7 @@ plt.text((x1+x2)*.5, y+h, "****", ha='center', va='bottom', color=col, size = 40
 
 #%% Section 6 - ROC curves: Random forest, Logistic Regression, SVM 
 
-# TODO SF 2
+#  SF 2
 
 sns.set(rc={'figure.figsize': (15, 15)})
 sns.set_style(style='white')
@@ -643,6 +606,4 @@ plot.output_backend = "svg"
 export_svgs(plot, filename = './figures/SF2/SF2_A_BCell_ActStatus_Condition_umap.svg')
 
 # hv.save(overlay, 'BCell_ActStatus_Condition_umap.html')
-
-#%%
 
