@@ -18,7 +18,7 @@ import os
 
 #Read in dataframe    
 path_main = Path(r'Z:\Rebecca\lymphocyte data\NK cell repeats')
-path_save = os.path.join(path_main, "F5")
+path_save = Path(r'C:\Users\jriendeau\Documents\GitHub\schmitz_r-lymphocyte_activation\figures\F5')
 
 csv_path = path_main / 'all_data_including_new_nk_normalized_donor.csv'
 all_df = pd.read_csv(csv_path)
@@ -37,12 +37,12 @@ y_variables = [
     ### LYMPHOCYTE PAPER VARIABLES#
         # "NADH_t1",
         # "NADH_t2",
-        "NADH_a1",
+        # "NADH_a1",
         # "FAD_t1",
         # "FAD_t2",
         # "FAD_a1",
         "Norm_RR",
-        "NADH_tm",
+        # "NADH_tm",
         # "FAD_tm",
         # "Cell_Size_Pix",
         # "Donor
@@ -99,7 +99,7 @@ for y_variable in y_variables:
                                     
                                    ],
                         
-                        test='Mann-Whitney', 
+                        test='Kruskal', 
                         text_format='star', 
                         loc='outside', 
                         verbose=1)
@@ -114,7 +114,7 @@ for y_variable in y_variables:
                         "CD69+\nT"], fontsize = 15)
     
     plt.ylabel(graph_titles.get(y_variable, ''))
-    
+    ax.tick_params(bottom=True, top=False, left=True, right=False)
     plt.xlabel("")
     
     plt.legend([],[], frameon=False)
