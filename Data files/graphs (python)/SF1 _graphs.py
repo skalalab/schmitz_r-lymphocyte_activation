@@ -60,7 +60,7 @@ graph_titles = {
    "FAD_t1": r"FAD $\tau_{1}$ (ps)",
    "FAD_t2": r"FAD $\tau_{2}$ (ps)",
    "FAD_a1": r"FAD $\alpha_{1}$ (%)",
-   "Norm_RR": "Normalized Redeox Ratio\nNAD(P)H/[FAD+NAD(P)H]",
+   "Norm_RR": "Normalized Redox Ratio\nNAD(P)H/[FAD+NAD(P)H]",
    "NADH_tm": r"NAD(P)H $\tau_{m}$ (ps)",
    "FAD_tm": r"FAD $\tau_{m}$ (ps)",
    "Cell_Size_Pix": r"Cell Size (# pixels)",
