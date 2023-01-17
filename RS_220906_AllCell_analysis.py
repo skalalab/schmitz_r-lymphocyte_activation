@@ -1109,15 +1109,15 @@ if len(list_omi_parameters) == 9:
     print("+"*20)
 
 
-print("SF7_D Quiescent")
-# cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
-# print(cm_table)
-print("-"*20)
-cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'])
-print(cm_table)
-
-df_acc = pd.DataFrame(cm_table)
-df_acc.to_csv('./figures/SF7/SF7_D_quiescent_confusion_matrix.csv')
+    print("SF7_D Quiescent")
+    # cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
+    # print(cm_table)
+    print("-"*20)
+    cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'])
+    print(cm_table)
+    
+    df_acc = pd.DataFrame(cm_table)
+    df_acc.to_csv('./figures/SF7/SF7_D_quiescent_confusion_matrix.csv')
 
 # for col, feature in zip(np.flip(all_df_edit.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
 #     print(col, clf.feature_importances_[feature])
