@@ -9,7 +9,7 @@ Various software was used to perform the analysis and generate the figures in th
   * RS_220906_BCell_analysis.py
   * RS_220906_NKCell_analysis.py
   * RS_220906_AllCell_analysis.py
-* Figures made in R 
+* Figures made in R
   * b_heatmap.R
   * nk_heatmap.R
   * allcell_hmap.R
@@ -20,23 +20,48 @@ Various software was used to perform the analysis and generate the figures in th
 
 <hr> 
 
-### Datasets:
+### Datasets (Single-cell OMI variables):
+* B Cell
+  * **Bcell_cyto_2group.csv** -  CD69+ activated and CD69- control 
+  * **Bcell_cyto_data.csv** - all four combinations of activation status (CD69-/CD69+) and culture condition (activated/control)
+  * **B_heatmap.csv** - Contents of _Bcell_cyto_2group.csv_, but formatted for ease of use in R with the ComplexHeatmap package.
+      * Activation
+        * 0 = CD69- control
+        * 1 = CD69+ activated
+      * Donor
+        * 1 = Donor A
+        * 2 = Donor B
+        * 3 = Donor C
+* NK Dataset 
+  * **NK data 2 groups.csv** -  CD69+ activated and CD69- control NK cells
+  * **NK data all groups.csv** - all four combinations of activation status (CD69-/CD69+) and culture condition (activated/control)
+  * **NK_heatmap.csv** - Contents of _NK data 2 groups.csv_, but formatted for ease of use in R with the ComplexHeatmap package.
+      * Activation
+        * 0 = CD69- control
+        * 1 = CD69+ activated
+      * Donor
+        * 4 = Donor D
+        * 5 = Donor E
+        * 6 = Donor F
 
-* **NK data 2 groups.csv** - Single-cell OMI data for CD69+ activated and CD69- control NK cells.
-* **NK data all groups.csv** - Single-cell OMI data for NK cells in all four combinations of activation status (CD69-/CD69+) and culture condition (activated/control)
-* **NK_heatmap.csv** - Contents of _NK data 2 groups.csv_, but formatted for ease of use in R with the ComplexHeatmap package.
-    * Activation: 0 = CD69- control, 1 = CD69+ activated
-    * Donor: 4 = Donor D, 5 = Donor E, 6 = Donor F
-* **Bcell_cyto_2group.csv** - Single-cell OMI data for CD69+ activated and CD69- control B-cells.
-* **Bcell_cyto_data.csv** - Single-cell OMI data for B-cells in all four combinations of activation status (CD69-/CD69+) and culture condition (activated/control)
-* **B_heatmap.csv** - Contents of _Bcell_cyto_2group.csv_, but formatted for ease of use in R with the ComplexHeatmap package.
-    * Activation: 0 = CD69- control, 1 = CD69+ activated
-    * Donor: 1 = Donor A, 2 = Donor B, 3 = Donor C
-* **AllCellData.csv** - Single-cell OMI data for CD69+ activated and CD69- control cells from all three cell types (NK, B, T)
-* **AllCellData_hmap.csv** - Contents of _AllCellData.csv_, but formatted for ease of use in R with the ComplexHeatmap package.
-    * Activation: 0 = CD69- control, 1 = CD69+ activated
-    * Cell Type: 0 = B-cells, 1 = NK cells, 2 = T-cells
-    * Donor: 1-6 same as above, 7 = Donor G, 8 = Donor H, 9 = Donor I, 10 = Donor J, 11 = Donor K, 12 = Donor L
+* All Data
+  * **all_data.csv** - CD69+ activated and CD69- control cells from all three cell types (NK, B, T)
+  * **AllCellData_hmap.csv** - Contents of _AllCellData.csv_, but formatted for ease of use in R with the ComplexHeatmap package.
+      * Activation
+        * 0 = CD69- control
+        * 1 = CD69+ activated
+      * Cell Type
+        * 0 = B-cells
+        * 1 = NK cells
+        * 2 = T-cells
+      * Donor
+        * 1-6 same as above
+        * 7 = Donor G
+        * 8 = Donor H
+        * 9 = Donor I
+        * 10 = Donor J
+        * 11 = Donor K
+        * 12 = Donor L
 <hr>
 
 ### Software Requirements:
@@ -71,30 +96,17 @@ Required files:
 * Bcell_cyto_data.csv
 
 Steps:
-1.	Load script into Python IDE of choice (this code was written in Spyder 4.2.5)
+1.	Load script into you Python IDE of choice
 2.	Run section 1 to import required packages
-3.	Run section 2 to set-up for ROC curve generation 
-4.	Run section 3 to read in Bcell_cyto_2group.csv, which contains single-cell OMI data from the CD69- control and CD69+ activated B-cells. 
-5.	B-cell activation status classification:
-    * In section 4, change line 82 to contain the desired OMI parameters used in the classifier. The code is written to have all 10 features, but can be changed to have any combination of features. 
-    * Make sure that ‘Activation’ is the last parameter in the list in line 82.
-    * Run Section 4, which will produce a confusion matrix, list of feature weights, an ROC curve, and metrics for assessing the performance of the classifier (accuracy, recall, precision, f1 score).
-6.	B-cell OMI UMAPs of CD69- control and CD69+ activated B-cells: 
-    * Sections 5-7 produce UMAPs from Bcell_cyto_2group.csv. All three sections use the same overall structure to generate the UMAP.
-        * Section 5: UMAP color-coded by activation
-        * Section 6: UMAP color-coded by donor
-        * Section 7: UMAP color-coded by both activation and donor.
-    * The UMAPs used in the paper figures can be generated by running this code as-is. 
-    * To alter the parameters of the UMAP or plotting in Section 5:
-        * UMAP input parameters such as n_neighbors, min_dist, etc. can be altered in lines 126 - 132.
-        * Factor used to determine color-coding is set by legend_entries in line 140.
-    * Similar alterations can be done in Sections 6 & 7 by locating and changing the same sections of code. 
-7.  B-cell OMI UMAPs of all four combinations of activation status (CD69-/CD69+) and culture condition (activated/control):
-    * Run Section 8 as-is to produce the UMAP used in the paper figures
-    * To alter the parameters of the UMAP or plotting:
-        * UMAP input parameters such as n_neighbors, min_dist, etc. can be altered in lines 342 - 348.
-        * Factor used to determine color-coding is set by legend_entries in line 355.
-
+3.	Run section 3 to read in Bcell_cyto_2group.csv, which contains single-cell OMI data from the CD69- control and CD69+ activated B-cells. 
+* **Section 4:** Random forest activation status classification. Produces a confusion matrix, list of feature weights, an ROC curve, and metrics for assessing the performance of the classifier (accuracy, recall, precision, f1 score).
+* **Section 6:** Random forest, Logistic Regression and SVM classifiers
+* OMI UMAPs of CD69- control and CD69+ activated B-cells: 
+  * **Section 7:** UMAP color-coded by activation
+  * **Section 8:** UMAP color-coded by donor
+  * **Section 9:** UMAP color-coded by both activation and donor.
+* OMI UMAPs of all four combinations of activation status (CD69-/CD69+) and culture condition (activated/control):
+    * **Section 10:** Produces the UMAP used in the paper figures
 <hr>
 
 **RS_220906_NKCell_analysis.py**
@@ -106,29 +118,17 @@ Required files:
 
 Steps:
 1.	Load script into Python IDE of choice (this code was written in Spyder 4.2.5)
-2.	Run section 1 to import required packages
-3.	Run section 2 to set-up for ROC curve generation 
-4.	Run section 3 to read in NK data 2 groups.csv, which contains single-cell OMI data from the CD69- control and CD69+ activated NK cells. 
+2.	**Section 1:** to import required packages
+3.	**Section 3:**  to read in NK data 2 groups.csv, which contains single-cell OMI data from the CD69- control and CD69+ activated NK cells. 
 5.	NK cell activation status classification:
-    * In section 4, change line 75 to contain the desired OMI parameters used in the classifier. The code is written to have all 10 features, but can be changed to have any combination of features. 
-    * Make sure that ‘Activation’ is the last parameter in the list in line 75.
-    * Run Section 4, which will produce a confusion matrix, list of feature weights, an ROC curve, and metrics for assessing the performance of the classifier (accuracy, recall, precision, f1 score).
+    * **Section 4:** Will produce a confusion matrix, list of feature weights, an ROC curve, and metrics for assessing the performance of the classifier (accuracy, recall, precision, f1 score).
 6.	NK cell OMI UMAPs of CD69- control and CD69+ activated NK cells: 
     * Sections 5-7 produce UMAPs from NK data 2 groups.csv. All three sections use the same overall structure to generate the UMAP.
-        * Section 5: UMAP color-coded by activation
-        * Section 6: UMAP color-coded by donor
-        * Section 7: UMAP color-coded by both activation and donor.
-    * The UMAPs used in the paper figures can be generated by running this code as-is. 
-    * To alter the parameters of the UMAP or plotting in Section 5:
-        * UMAP input parameters such as n_neighbors, min_dist, etc. can be altered in lines 118 - 126.
-        * Factor used to determine color-coding is set by legend_entries in line 140.
-    * Similar alterations can be done in Sections 6 & 7 by locating and changing the same sections of code. 
+        * **Section 5:** UMAP color-coded by activation
+        * **Section 6:** UMAP color-coded by donor
+        * **Section 7:** UMAP color-coded by both activation and donor.
 7.  NK cell OMI UMAPs of all four combinations of activation status (CD69-/CD69+) and culture condition (activated/control):
-    * Run Section 8 as-is to produce the UMAP used in the paper figures
-    * To alter the parameters of the UMAP or plotting:
-        * UMAP input parameters such as n_neighbors, min_dist, etc. can be altered in lines 336-342.
-        * Factor used to determine color-coding is set by legend_entries in line 349.
-
+    * **Section 8:** Produces the UMAP used in the paper figures
 <hr>
 
 **RS_220906_AllCell_analysis.py**
@@ -139,36 +139,25 @@ Required files:
   
 Steps:
 1.	Load script into Python IDE of choice (this code was written in Spyder 4.2.5)
-2.	Run section 1 to import required packages
-3.	Run section 2 to set-up for ROC curve generation 
-4.	Run section 3 to read in AllCellData.csv, which contains single-cell OMI data for all three cell types (T-cells, NK cells, and B-cells)
+2.	**Section 1:** to import required packages
+4.	**Section 3:** to read in _AllCellData.csv_, which contains single-cell OMI data for all three cell types (T-cells, NK cells, and B-cells)
 5.	Activation status classifier:
-    * In section 4, change line 85 to contain the desired OMI parameters used in the classifier. The code is written to have all 10 features, but can be changed to have any combination of features. 
-    * Make sure that ‘Activation’ is the last parameter in the list in line 85.
-    * Run Section 4, which will produce a confusion matrix, list of feature weights, an ROC curve, and metrics for assessing the performance of the classifier (accuracy, recall, precision, f1 score).
+    * **Section 4:** Will produce a confusion matrix, list of feature weights, an ROC curve, and metrics for assessing the performance of the classifier (accuracy, recall, precision, f1 score).
 6.  Cell type and cell type + activation classifiers:
     * Sections 5 - 7 use the same structure to run and assess random forest classifiers. This classifiers are focused on different classes within the single cell OMI data of CD69- control and CD69+ activated lymphocytes:
-        * Section 5: Classification of cell type (B-cell, T-cell, NK cell)
-        * Section 6: Classification of cell type (based on only CD69- control cells)
-        * Section 7: Classification of both cell type and activation status (B-cell, T-cell, NK cell and CD69+/CD69-)
-    * These classifiers do not generate ROC curves because ROC curve generation requires "one vs. all" classification where the class outcomes are binary. However, the other metrics to assess classifier performance are still produced.
-    * In line 132/179/238, change the list to include whichever OMI parameters are desired in the classifier. 
-        * The parameter encoding class (previously 'Activation') does NOT need to be added to this list, unlike in the activation status classifier. This code will generate the classes separately from this list. 
+        * **Section 5:** Classification of cell type (B-cell, T-cell, NK cell)
+        * **Section 6:** Classification of cell type (based on only CD69- control cells)
+        * **Section 7:** Classification of both cell type and activation status (B-cell, T-cell, NK cell and CD69+/CD69-)
+    * **Note:** These classifiers do not generate ROC curves because ROC curve generation requires "one vs. all" classification where the class outcomes are binary. However, the other metrics to assess classifier performance are still produced.
     * Run Section 5/6/7, which will produce a confusion matrix, feature weights, and metrics to assess classifier performance (accuracy/precision/recall/f1 score). 
 7.	UMAPs of OMI data from all cell types: 
     * Sections 8 - 13 produce UMAPs from AllCellData.csv. All sections use the same overall structure to generate the UMAP.
-        * Section 8: UMAP color-coded by activation status
-        * Section 9: UMAP color-coded by cell type 
+        * **Section 8:** UMAP color-coded by activation status
+        * **Section 9:** UMAP color-coded by cell type 
         * Section 10: UMAP color-coded by cell type (CD69- control cells only)
-        * Section 11: UMAP color-coded by cell type and activation status
-        * Section 12: UMAP color-coded by cell type and donor
-        * Section 13: UMAP color-coded by activation status and donor
-    * The UMAPs used in the paper figures can be generated by running this code as-is. 
-    * To alter the parameters of the UMAP or plotting in Section 8:
-        * UMAP input parameters such as n_neighbors, min_dist, etc. can be altered in lines 294 - 300.
-        * Factor used to determine color-coding is set by legend_entries in line 308.
-        * Colors used in color-coding and other plotting parameters can be changed in lines 327 - 348.
-    * Similar alterations can be done in Sections 9 - 13 by locating and changing the same sections of code. 
+        * **Section 11:** UMAP color-coded by cell type and activation status
+        * **Section 12:** UMAP color-coded by cell type and donor
+        * **Section 13:** UMAP color-coded by activation status and donor
 
 <hr>
 
