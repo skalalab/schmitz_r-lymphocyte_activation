@@ -15,6 +15,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import sklearn.utils as skutils
 from sklearn.preprocessing import StandardScaler
+
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 
@@ -47,8 +48,6 @@ from helper import run_analysis_on_classifier, _train_test_split
 from datetime import date 
 date_today = date.today()
 from pathlib import Path
-
-    
 #%% Section 3 - Read in and set up dataframe 
 
 #Read in dataframe    
@@ -96,9 +95,14 @@ df_t_cells_labeled = df_t_cells_labeled.rename(columns={'Nt1' : 'NADH_t1',
 df_t_cells_labeled.groupby(by=["Donor",'Activation'])['Norm_RR'].mean()
 ## END NORMALIZING AND FORMATTING T CELL DATA
 
+df_t_cells_labeled['count'] = 1
+
 # Replace T cell data
 all_df = all_df[all_df['Cell_Type'] != 'T-cells']
 all_df = pd.concat([all_df, df_t_cells_labeled])
+
+all_df.groupby(['Cell_Type','Activation'])['count'].count()
+
 
 #%% Remove old NK donors and add new ones
 all_df = all_df[all_df['Cell_Type'] != 'NK-Cells']
@@ -145,8 +149,6 @@ df_concat['Cell_Type'].unique()
 all_df = df_concat
 
 ##%%%
-
-
 print(all_df.groupby(by=['Cell_Type','Group','Activation',])['Cell_Size_Pix'].count())
 print("*" * 20)
 print(all_df.groupby(by=['Cell_Type','Donor','Activation'])['Norm_RR'].mean())
@@ -169,18 +171,37 @@ d = str(date_today.year) + str(date_today.month).zfill(2) + str(date_today.day).
 all_df.to_csv(f"./Data files/ecg_feature_exports/{d}_all_data_including_new_nk_normalized_donor.csv", index=False)
 
 
+#%%
+
+####
+def train_test_split_B_NK_T(df_data, list_cols):
+    # B and NK 70:30 split
+    X_train, X_test, y_train, y_test = _train_test_split(df_data[df_data['Cell_Type'].isin(['B-Cells','NK-Cells',])], 
+                                                         list_cols, 
+                                                         classes, 
+                                                         test_size=0.3 )
+    
+    # T 50:50 
+    X_train_t, X_test_t, y_train_t, y_test_t = _train_test_split(df_data[df_data['Cell_Type'].isin(['T-Cells',])], 
+                                                                 list_cols, 
+                                                                 classes, 
+                                                                 test_size=0.5 )
+    X_train = pd.concat([X_train, X_train_t])
+    X_test = pd.concat([ X_test, X_test_t])
+    y_train =np.concatenate([y_train, y_train_t ])
+    y_test = np.concatenate([y_test, y_test_t ])
+    return  X_train, X_test, y_train, y_test
+#####
 #%% Section 4 - All cell activation classifier ROCs - Plot all curves together 
 
 #TODO FIGURE 5 D
 
 # SF5 B accuracies 
-
 # SF5_C importances
 
 print('All cell activation classifier')
 
 #Generate df with only the OMI variables we want to include in the classifier (***Always keep Activation column last)
-
 colors = ['#fde725', '#a5db36', '#4ac16d','#1f988b','#2a788e','#414487', '#440154']
 
 custom_color = sns.set_palette(sns.color_palette(colors))
@@ -188,14 +209,13 @@ custom_color = sns.set_palette(sns.color_palette(colors))
 #Generate df with only the OMI variables we want to include in the classifier (***Always keep Activation column last)
 
 list_top_vars = []
-
 dict_accuracies = {}
 
 ##%% ################## 10 features
 
 list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] #, 'Cell_Size_Pix'
 
-X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
+X_train, X_test, y_train, y_test = train_test_split_B_NK_T(df_data, list_cols)
 
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
@@ -218,7 +238,7 @@ plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 
 list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] # , 'Cell_Size_Pix'
 
-X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
+X_train, X_test, y_train, y_test = train_test_split_B_NK_T(df_data, list_cols)
 
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
@@ -235,7 +255,7 @@ list_cols = list(forest_importances.keys()[:4])
 list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
 
 
-X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
+X_train, X_test, y_train, y_test = train_test_split_B_NK_T(df_data, list_cols)
 
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
@@ -250,7 +270,7 @@ plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 list_cols = list(forest_importances.keys()[:3])
 list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
 
-X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
+X_train, X_test, y_train, y_test = train_test_split_B_NK_T(df_data, list_cols)
 
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
@@ -265,7 +285,7 @@ plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 list_cols = list(forest_importances.keys()[:2])
 list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
 
-X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
+X_train, X_test, y_train, y_test = train_test_split_B_NK_T(df_data, list_cols)
 
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
@@ -280,7 +300,7 @@ plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 list_cols = list(forest_importances.keys()[:1])
 list_top_vars.append(f"Top {len(list_cols)} : {list_cols}")
 
-X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
+X_train, X_test, y_train, y_test = train_test_split_B_NK_T(df_data, list_cols)
 
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
@@ -293,7 +313,7 @@ plt.scatter(op_point[0],op_point[1], c='k', s= 500, zorder=2)
 ##%% ################## Redox + Cell Size
 list_cols = [ 'Norm_RR'] #, 'Cell_Size_Pix'
 
-X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
+X_train, X_test, y_train, y_test = train_test_split_B_NK_T(df_data, list_cols)
 
 clf = RandomForestClassifier(random_state=0).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
@@ -340,7 +360,7 @@ colors = ['#fde725', '#1f988b','#440154']
 custom_color = sns.set_palette(sns.color_palette(colors))
 
 list_cols = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] #, 'Cell_Size_Pix'
-X_train, X_test, y_train, y_test = _train_test_split(df_data, list_cols, classes)
+X_train, X_test, y_train, y_test = train_test_split_B_NK_T(df_data, list_cols)
 
 clf = RandomForestClassifier(random_state=0, class_weight=class_weight).fit(X_train, y_train)
 fpr, tpr, roc_auc, accuracy, op_point  = run_analysis_on_classifier(clf, X_test, y_test, dict_classes)
@@ -930,10 +950,43 @@ print('Accuracy score =', accuracy_score(y_test, y_pred))
 print(classification_report(y_test,y_pred))
 
 
+#%%
 
+def train_test_split_B_NK_T_multi(all_df_edit, list_omi_parameters):
+    #extracts classes from variable of interest (here it's cell type)
+    classes = all_df_edit.Cell_Type.unique()
+    factor = pd.factorize(all_df_edit.Cell_Type)
+    
+    # make new column with labels for each class
+    all_df_edit.loc[:, 'CT_LABELS'] = factor[0]
+    definitions = factor[1]
+    
+    ## B NK
+    df_bnk = all_df_edit[all_df_edit['Cell_Type'].isin(['B-Cells', 'NK-Cells'])]
+    X = df_bnk[list_omi_parameters] 
+    y = df_bnk['CT_LABELS'].values
+    #Designate train/test data, random forest classifier
+    X_train_bnk, X_test_bnk, y_train_bnk, y_test_bnk = train_test_split(X, y, test_size=0.30, random_state=0)
+    print(f"B split: {len(X_train_bnk)} y_train {len(y_train_bnk)}  x_test {len(X_test_bnk)}  y_test {len(y_test_bnk)}")
+    
+    ## T
+    df_t = all_df_edit[all_df_edit['Cell_Type'].isin(['T-Cells'])]
+    X = df_t[list_omi_parameters] 
+    y = df_t['CT_LABELS'].values
+    #Designate train/test data, random forest classifier
+    X_train_t, X_test_t, y_train_t, y_test_t = train_test_split(X, y, test_size=0.50, random_state=0)
+    print(f"T split: {len(X_train_t)} y_train {len(y_train_t)}  x_test {len(X_test_t)}  y_test {len(y_test_t)}")
+
+    
+    ### merge train test datasets
+    X_train = pd.concat([X_train_bnk, X_train_t ])
+    X_test = pd.concat([X_test_bnk, X_test_t])
+    y_train = np.concatenate([y_train_bnk, y_train_t])
+    y_test = np.concatenate([y_test_bnk, y_test_t])
+    
+    return  X_train, X_test, y_train, y_test, classes, definitions
 #%% Section 5 - Cell Type Classifier
-
-# SF6_C
+# SF6_C confusion matrix
 
 print('All cell data cell type classifier')
 
@@ -945,34 +998,22 @@ list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FA
 
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
-# # # # # # # ##### Top variables
-# list_omi_parameters = ['FAD_tm']
-# list_omi_parameters = ['FAD_tm', 'FAD_t1']
-# list_omi_parameters = ['FAD_tm', 'FAD_t1', 'NADH_tm']
-# list_omi_parameters = ['FAD_tm', 'FAD_t1', 'NADH_tm', 'FAD_a1']
-# # # # # # # # #####
-# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] # , 'Cell_Size_Pix'
-# list_omi_parameters = ['Norm_RR', ] #'Cell_Size_Pix'
+# # # # # # # # # ##### Top variables
+# list_omi_parameters = ['FAD_t1']
+# list_omi_parameters = ['FAD_t1', 'FAD_tm']
+# list_omi_parameters = ['FAD_t1', 'FAD_tm', 'FAD_a1']
+# list_omi_parameters = ['FAD_t1', 'FAD_tm', 'FAD_a1', 'Norm_RR']
+# # # # # # # # # # #####
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] 
+# list_omi_parameters = ['Norm_RR'] 
 # list_omi_parameters = ['NADH_a1']
    
 #Make copy of main data frame, pull out OMI variables we want in classifier
 all_df_edit = all_df.copy()
-all_df_edit = all_df_edit[list_omi_parameters]
+X_train, X_test, y_train, y_test, classes, definitions = train_test_split_B_NK_T_multi(all_df_edit, list_omi_parameters)
 
-from sklearn.preprocessing import StandardScaler
+#########
 
-#extracts classes from variable of interest (here it's cell type)
-classes = all_df.Cell_Type.unique()
-
-factor = pd.factorize(all_df.Cell_Type)
-
-#make new column with labels for each class
-all_df['CT_LABELS'] = factor[0]
-definitions = factor[1]
-X, y = all_df_edit, all_df['CT_LABELS'].values
-
-#Designate train/test data, random forest classifier
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.fit_transform(X_test)
@@ -997,7 +1038,7 @@ if len(list_omi_parameters) == 9:
     forest_importances = pd.Series(clf.feature_importances_*100, index=list_omi_parameters).sort_values(ascending=False)
     print(forest_importances)
     df_acc = pd.DataFrame(forest_importances)
-    df_acc.to_csv('./figures/SF6/SF6_C_importances.csv')
+    df_acc.to_csv('./figures/SF6/SF6_B_importances.csv')
     print("+" * 20)
 
 #Print metrics for classifier assessment
@@ -1005,7 +1046,6 @@ print('Accuracy score =', accuracy_score(y_test, y_pred))
 # print(classification_report(y_test,y_pred))
 
 #%% Section 6 - Cell type classifer (QUIESCENT ONLY)
-from sklearn.preprocessing import StandardScaler
 
 #TODO SF7 D confusion matrix and pie chart
 
@@ -1015,33 +1055,37 @@ list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FA
 # SF 7 B accuracies
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] #, 'Cell_Size_Pix'
 
-# # # # # # # ##### Top variables
-# list_omi_parameters = ['FAD_tm']
-# list_omi_parameters = ['FAD_tm', 'FAD_t1']
-# list_omi_parameters = ['FAD_tm', 'FAD_t1','NADH_tm']
-# list_omi_parameters = ['FAD_tm', 'FAD_t1','NADH_tm', 'NADH_a1']
-# # # # # # # # ##### Top variables
+# # # # # # # # # ##### Top variables
+# list_omi_parameters = ['FAD_t1']
+# list_omi_parameters = ['FAD_t1', 'FAD_tm']
+# list_omi_parameters = ['FAD_t1', 'FAD_tm','NADH_tm']
+# list_omi_parameters = ['FAD_t1', 'FAD_tm','NADH_tm', 'NADH_t1']
+# # # # # # # # # # # ##### Top variables
 
-# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] #, 'Cell_Size_Pix'
-# list_omi_parameters = ['Norm_RR'] # , 'Cell_Size_Pix'
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] 
+# list_omi_parameters = ['Norm_RR'] 
 
 #Create subset of dataset that only contains CD69- control cells 
-all_df_qonly = all_df.loc[all_df['Activation']=='CD69-']
-all_df_edit = all_df_qonly[list_omi_parameters]
-
+all_df_qonly = all_df.loc[all_df['Activation']=='CD69-'].copy()
+# all_df_edit = all_df_qonly[list_omi_parameters]
 
 print('All cell data cell type classifier - Quiescent cells only')
 
-#Same classifier code structure as Section 5 - see Section 5 comments for details
-classes = all_df_qonly.Cell_Type.unique()
-factor = pd.factorize(all_df_qonly.Cell_Type)
-all_df_qonly['CT_LABELS'] = factor[0]
-definitions = factor[1]
+# #Same classifier code structure as Section 5 - see Section 5 comments for details
+# classes = all_df_qonly.Cell_Type.unique()
+# factor = pd.factorize(all_df_qonly.Cell_Type)
+# all_df_qonly['CT_LABELS'] = factor[0]
+# definitions = factor[1]
 
-X, y = all_df_edit, all_df_qonly['CT_LABELS'].values
+# X, y = all_df_edit, all_df_qonly['CT_LABELS'].values
 
-#####
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
+
+X_train, X_test, y_train, y_test, classes, definitions = train_test_split_B_NK_T_multi(all_df_qonly, list_omi_parameters)
+
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
+
+#######
 scaler = StandardScaler()
 
 X_train = scaler.fit_transform(X_train)
@@ -1089,40 +1133,70 @@ print('All cell data cell type + activation classifier')
 
 #Same classifier code structure as Section 5 - see Section 5 comments for details
 
-
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] #, 'Cell_Size_Pix'
 
 # # # # ## Figure 5 F
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
-# # # # # # ##### Top variables
-# list_omi_parameters = ['NADH_a1']
-# list_omi_parameters = ['NADH_a1', 'NADH_t1']
-# list_omi_parameters = ['NADH_a1', 'NADH_t1','NADH_tm'] # , 'Cell_Size_Pix'
-# list_omi_parameters = ['NADH_a1', 'NADH_t1', 'NADH_tm', 'FAD_tm'] # , 'Cell_Size_Pix'
-# # # # # # # # ##### Top variables
+# # # # # # # ##### Top variables
+# list_omi_parameters = ['FAD_t1']
+# list_omi_parameters = ['FAD_t1', 'NADH_a1']
+# list_omi_parameters = ['FAD_t1', 'NADH_a1','NADH_t1']
+# list_omi_parameters = ['FAD_t1', 'NADH_a1', 'NADH_t1', 'Norm_RR'] 
+# # # # # # # # # ##### Top variables
 
-# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] # , 'Cell_Size_Pix'
-# list_omi_parameters = ['Norm_RR'] # , 'Cell_Size_Pix'
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2']
+# list_omi_parameters = ['Norm_RR'] 
 
 
 all_df_edit = all_df.copy()
-all_df_edit = all_df_edit[list_omi_parameters]
+#########
 
-from sklearn.preprocessing import StandardScaler
 
-classes = all_df.Type_Activation.unique()
+# all_df_edit = all_df_edit[list_omi_parameters]
 
-factor = pd.factorize(all_df.Type_Activation)
+# classes = all_df.Cell_Type.unique()
+# factor = pd.factorize(all_df.Cell_Type)
 
-all_df['CT_LABELS'] = factor[0]
+# # make new column with labels for each class
+# all_df['CT_LABELS'] = factor[0]
+# definitions = factor[1]
 
+classes = all_df_edit.Type_Activation.unique()
+factor = pd.factorize(all_df_edit.Type_Activation)
+all_df_edit['CT_LABELS'] = factor[0]
 definitions = factor[1]
 
-X, y = all_df_edit, all_df['CT_LABELS'].values
+## B NK
+df_bnk = all_df_edit[all_df_edit['Cell_Type'].isin(['B-Cells', 'NK-Cells'])]
+X = df_bnk[list_omi_parameters] 
+y = df_bnk['CT_LABELS'].values
+#Designate train/test data, random forest classifier
+X_train_bnk, X_test_bnk, y_train_bnk, y_test_bnk = train_test_split(X, y, test_size=0.30, random_state=0)
+print(f"B split: {len(X_train_bnk)} y_train {len(y_train_bnk)}  x_test {len(X_test_bnk)}  y_test {len(y_test_bnk)}")
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
+## T
+df_t = all_df_edit[all_df_edit['Cell_Type'].isin(['T-Cells'])]
+X = df_t[list_omi_parameters] 
+y = df_t['CT_LABELS'].values
+#Designate train/test data, random forest classifier
+X_train_t, X_test_t, y_train_t, y_test_t = train_test_split(X, y, test_size=0.50, random_state=0)
+print(f"T split: {len(X_train_t)} y_train {len(y_train_t)}  x_test {len(X_test_t)}  y_test {len(y_test_t)}")
 
+### merge train test datasets
+X_train = pd.concat([X_train_bnk, X_train_t ])
+X_test = pd.concat([X_test_bnk, X_test_t])
+y_train = np.concatenate([y_train_bnk, y_train_t])
+y_test = np.concatenate([y_test_bnk, y_test_t])
+
+# classes = all_df.Type_Activation.unique()
+# factor = pd.factorize(all_df.Type_Activation)
+# all_df['CT_LABELS'] = factor[0]
+# definitions = factor[1]
+# X, y = all_df_edit, all_df['CT_LABELS'].values
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
+
+###############
 scaler = StandardScaler()
 
 X_train = scaler.fit_transform(X_train)
@@ -1145,20 +1219,20 @@ forest_importances = pd.Series(clf.feature_importances_*100, index=list_omi_para
 print(forest_importances)
 print("+"*20)
 
-# df_acc = pd.DataFrame(forest_importances, index=[0])
-forest_importances.to_csv('./figures/SF8/SF8_B_feature_importances.csv')
+if len(list_omi_parameters) == 9:
+    # df_acc = pd.DataFrame(forest_importances, index=[0])
+    forest_importances.to_csv('./figures/SF8/SF8_B_feature_importances.csv')
+    
+    print("SF8_C")
+    # cm_table1 = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
+    # print(cm_table1)
+    print("-" * 30)
+    cm_table2 = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'])
+    
+    df_acc = pd.DataFrame(cm_table2)
+    df_acc.to_csv('./figures/SF8/SF8_C_confusion_matrix.csv')
 
-print("SF8_C")
-# cm_table1 = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
-# print(cm_table1)
-print("-" * 30)
-cm_table2 = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'])
-
-
-df_acc = pd.DataFrame(cm_table2)
-df_acc.to_csv('./figures/SF8/SF8_C_confusion_matrix.csv')
-
-print(cm_table2)
+    print(cm_table2)
 # for col, feature in zip(np.flip(all_df_edit.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
 #     print(col, clf.feature_importances_[feature])
 
