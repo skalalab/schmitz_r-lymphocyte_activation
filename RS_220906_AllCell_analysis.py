@@ -404,7 +404,6 @@ plt.show()
 
 #%% Section 6 - UMAP of activation status
 
-
 # SF5 A
  
 #list of parameters we want to use for the UMAP. I used ten OMI features (Normalized redox ratio, NAD(P)H lifetimes, FAD lifetimes, and cell size)
@@ -478,7 +477,6 @@ export_svgs(plot, filename = './figures/SF5/SF5_A_AllCell_ActStatus_umap.svg')
 
 #%% Section 7 - UMAP of cell type
 
-
 # SF6 A 
 
 #Same structure as Section 6 - see comments for more detail 
@@ -548,7 +546,6 @@ export_svgs(plot, filename = './figures/SF6/SF6_A_AllCell_CellType_umap.svg')
 # hv.save(overlay, 'AllCell_CellType_umap.svg')
 
 #%% Setion 8 - UMAP of cell type (QUIESCENT ONLY)
-
 
 # SF7_A
 #Same structure as Section 6 - see comments for more detail 
@@ -766,11 +763,9 @@ export_svgs(plot, filename = './figures/NF_AllCell_CellType_Donor_umap.svg')
 # hv.save(overlay, 'AllCell_CellType_Donor_umap.svg')
 #%% Section 11 - UMAP of activation status color-coded by donor
 
-
 # SF8_A
 
 #Same structure as Section 6 - see comments for more detail 
-
 
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
@@ -833,28 +828,6 @@ plot.output_backend = "svg"
 export_svgs(plot, filename = './figures/SF8/SF8_A_AllCell_CellType_Donor_ActStatus_umap.svg')
 
 # hv.save(overlay, "figures/" 'AllCell_CellType_Donor_ActStatus_umap.svg')
-
-
-#%% MERGED FROM THE PREVIOUS SCRIPT 
-
-
-
-# import umap.umap_ as umap
-# import numpy as np 
-# import pandas as pd
-# import matplotlib.pyplot as plt
-# from sklearn.preprocessing import StandardScaler
-
-# from sklearn.metrics import roc_curve, auc, confusion_matrix, accuracy_score, classification_report
-# from sklearn.ensemble import RandomForestClassifier
-
-# from sklearn.preprocessing import label_binarize
-# from sklearn.model_selection import train_test_split
-
-# import holoviews as hv
-# hv.extension("bokeh")
-# from holoviews import opts
-# from holoviews.plotting import list_cmaps
 
 
 
@@ -962,63 +935,7 @@ def train_test_split_B_NK_T_multi(all_df_edit, list_omi_parameters):
     #extracts classes from variable of interest (here it's cell type)
     
     classes = {cell_type: idx for idx, cell_type in enumerate(all_df_edit['Cell_Type'].unique())}   
-    # classes = {'B-Cells': 0, 'NK-Cells': 1, 'T-Cells': 2}
-    
-    #######IMPLEMENTATION 1 70:30 split on all the data
-    # df = all_df_edit
-    # df['CT_LABELS'] = df['Cell_Type'].map(classes)
-    # X = df[list_omi_parameters] 
-    # y = df['CT_LABELS'].values
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0, shuffle=True)
-    # print(f"All data split: {len(X_train)} y_train {len(y_train)}  x_test {len(X_test)}  y_test {len(y_test)}")
-    # print(pd.Series(y_test).value_counts())
-    
-    # y_train = pd.Series(y_train)
-    # y_test = pd.Series(y_test)
-    
-    #######IMPLEMENTATION 2 70:30 B and NK  | 50:50 T cells
-    
-    # df_b = all_df_edit[all_df_edit['Cell_Type'].isin(['B-Cells'])]
-    # df_b = shuffle(df_b, random_state=0)
-    
-    # df_nk = all_df_edit[all_df_edit['Cell_Type'].isin(['NK-Cells'])]
-    # df_nk = shuffle(df_nk, random_state=0)
-    
-    # df_t = all_df_edit[all_df_edit['Cell_Type'].isin(['T-Cells'])]
-    # df_t = shuffle(df_t, random_state=0)
-    
-    # # split into training and testing
-    # idx_b_split = int(np.floor(len(df_b) * 0.7))
-    # idx_nk_split = int(np.floor(len(df_nk) * 0.7))
-    # idx_t_split = int(np.floor(len(df_t) * 0.7))
-    
-    # # train
-    # df_train = pd.concat([df_b[:idx_b_split], 
-    #                       df_nk[:idx_nk_split], 
-    #                       df_t[:idx_t_split]], 
-    #                      ignore_index=True)
-    # print("train group\n", df_train.groupby(by=['Cell_Type'])['Cell_Type'].count())
-    # df_train['CT_LABELS'] = df_train['Cell_Type'].map(classes)
-    
-    # # test
-    # df_test = pd.concat([df_b[idx_b_split:],
-    #                      df_nk[idx_nk_split:],
-    #                      df_t[idx_t_split:]],
-    #                     ignore_index=True)
-    # print("test group\n", df_test.groupby(by=['Cell_Type'])['Cell_Type'].count())
-    # df_test['CT_LABELS'] = df_test['Cell_Type'].map(classes)
-    # print("test group\n", df_test.groupby(by=['CT_LABELS'])['CT_LABELS'].count())
-    
-    # # ### merge train test datasets
-    # X_train = df_train[list_omi_parameters]
-    # X_test = df_test[list_omi_parameters]
-    # y_train = df_train['CT_LABELS']
-    # y_test = df_test['CT_LABELS']
-    ############################
-    
-    # return  X_train, X_test, y_train, y_test, classes
-   
-    #######IMPLEMENTATION 3  70:30 B and NK  | 50:50 T cells
+
     # Format {cell_type : test_size}
     data_splits = {'B-Cells': 0.5 , 'NK-Cells' : 0.5, 'T-Cells' : 0.5}
     
@@ -1057,10 +974,6 @@ def train_test_split_B_NK_T_multi(all_df_edit, list_omi_parameters):
     return  X_train_all, X_test_all, pd.Series(y_train_all), pd.Series(y_test_all), classes
 
 
-### options  
-# same size dataframe (throw away data, keep 696 from smallest dataset)
-# unbalaned training : balanced test
-# balanced training : unbalanced test
 
 #%% Section 5 - Cell Type Classifier
 # SF6_C confusion matrix
@@ -1074,12 +987,12 @@ list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FA
 # F5 E accuracies
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
-# # # # # # # # # ##### Top variables
+# # # # # # # # # # ##### Top variables
 # list_omi_parameters = ['FAD_t1']
 # list_omi_parameters = ['FAD_t1', 'FAD_tm']
 # list_omi_parameters = ['FAD_t1', 'FAD_tm', 'FAD_a1']
 # list_omi_parameters = ['FAD_t1', 'FAD_tm', 'FAD_a1', 'Norm_RR']
-# # # # # # # # # # #####
+# # # # # # # # # # # #####
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] 
 # list_omi_parameters = ['Norm_RR'] 
 # list_omi_parameters = ['NADH_a1']
@@ -1110,7 +1023,7 @@ print(cm_table)
 
 if len(list_omi_parameters) == 9:
     print("+" * 20)
-    print("Figure SF6_C piechart of importance on all features")
+    print("Figure SF6_B piechart of importance on all features")
     forest_importances = pd.Series(clf.feature_importances_*100, index=list_omi_parameters).sort_values(ascending=False)
     print(forest_importances)
     df_acc = pd.DataFrame(forest_importances)
@@ -1135,8 +1048,8 @@ list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FA
 # list_omi_parameters = ['FAD_t1']
 # list_omi_parameters = ['FAD_t1', 'FAD_tm']
 # list_omi_parameters = ['FAD_t1', 'FAD_tm','NADH_tm']
-# list_omi_parameters = ['FAD_t1', 'FAD_tm','NADH_tm', 'NADH_t1']
-# # # # # # # # # # # ##### Top variables
+# list_omi_parameters = ['FAD_t1', 'FAD_tm','NADH_tm', 'FAD_a1']
+# # # # # # # # # # # # ##### Top variables
 
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2'] 
 # list_omi_parameters = ['Norm_RR'] 
@@ -1217,15 +1130,14 @@ print('All cell data cell type + activation classifier')
 
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] #, 'Cell_Size_Pix'
 
-# # # # ## Figure 5 F
+# # # # ## F5 F
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
-
 # # # # # # # ##### Top variables
-# list_omi_parameters = ['FAD_t1']
-# list_omi_parameters = ['FAD_t1', 'NADH_a1']
-# list_omi_parameters = ['FAD_t1', 'NADH_a1','NADH_t1']
-# list_omi_parameters = ['FAD_t1', 'NADH_a1', 'NADH_t1', 'Norm_RR'] 
-# # # # # # # # # ##### Top variables
+# list_omi_parameters = ['NADH_a1']
+# list_omi_parameters = ['NADH_a1', 'FAD_t1']
+# list_omi_parameters = ['NADH_a1', 'FAD_t1','NADH_t1']
+# list_omi_parameters = ['NADH_a1', 'FAD_t1', 'NADH_t1', 'FAD_tm'] 
+# # # # # # # # # # ##### Top variables
 
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2']
 # list_omi_parameters = ['Norm_RR'] 
