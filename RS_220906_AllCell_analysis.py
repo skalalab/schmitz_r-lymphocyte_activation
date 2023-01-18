@@ -33,6 +33,8 @@ from bokeh.io import export_svgs
 from pprint import pprint
 from pprint import pprint
 
+from sklearn.utils import shuffle
+
 import pandas as pd
 import seaborn as sns
 import numpy as np 
@@ -179,15 +181,15 @@ def train_test_split_B_NK_T(df_data, list_cols):
     X_train, X_test, y_train, y_test = _train_test_split(df_data[df_data['Cell_Type'].isin(['B-Cells','NK-Cells',])], 
                                                          list_cols, 
                                                          classes, 
-                                                         test_size=0.3 )
+                                                         test_size=0.5)
     
     # T 50:50 
     X_train_t, X_test_t, y_train_t, y_test_t = _train_test_split(df_data[df_data['Cell_Type'].isin(['T-Cells',])], 
                                                                  list_cols, 
                                                                  classes, 
-                                                                 test_size=0.5 )
-    X_train = pd.concat([X_train, X_train_t])
-    X_test = pd.concat([ X_test, X_test_t])
+                                                                 test_size=0.5)
+    X_train = pd.concat([X_train, X_train_t], ignore_index=True)
+    X_test = pd.concat([ X_test, X_test_t], ignore_index=True)
     y_train =np.concatenate([y_train, y_train_t ])
     y_test = np.concatenate([y_test, y_test_t ])
     return  X_train, X_test, y_train, y_test
@@ -731,7 +733,11 @@ scatter_umaps = [hv.Scatter(df_data[df_data[legend_entries] == entry], kdims=kdi
 
 
 
-colors = ["#440154", "#482173", "#433e85", "#38588c", "#2d708e", "#25858e",  "#1e9b8a",  "#2ab07f", "#52c569", "#86d549", "#c2df23", "#fde725" ]
+# colors = ["#440154", "#482173", "#433e85", "#38588c", "#2d708e", "#25858e",  "#1e9b8a",  "#2ab07f", "#52c569", "#86d549", "#c2df23", "#fde725" ]
+colors = ['r','g','r','b','r','g','b','g','b' ]
+
+# b,b,t,b,n,t,t,n,n
+# r,g,r,b,r,g,b,g,b
 for scatter, color in zip(scatter_umaps, colors):
     scatter.opts(color=color)
 
@@ -756,7 +762,7 @@ overlay.opts(
 
 plot = hv.render(overlay)
 plot.output_backend = "svg"
-# export_svgs(plot, filename = './figures/all/NF_AllCell_CellType_Donor_umap.svg')
+export_svgs(plot, filename = './figures/NF_AllCell_CellType_Donor_umap.svg')
 # hv.save(overlay, 'AllCell_CellType_Donor_umap.svg')
 #%% Section 11 - UMAP of activation status color-coded by donor
 
@@ -863,7 +869,7 @@ def calculate_roc_rf(rf_df, key='Activation'):
     #designate train/test data, random forest classifier
     X, y = rf_df.iloc[:,:-1], rf_df[[key]]
     y = label_binarize(y, classes=classes)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0, shuffle=True)
     y_train = np.ravel(y_train)
     clf = RandomForestClassifier(random_state=0)
     y_score = clf.fit(X_train, y_train).predict_proba(X_test)
@@ -923,7 +929,7 @@ classes = ['CD69-', 'CD69+']
 #Split training/testing data, random forest classifier
 X, y = all_df_edit.iloc[:,:-1], all_df_edit[['Activation']]
 y = label_binarize(y, classes=classes)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0, shuffle=True)
 y_train = np.ravel(y_train)
 clf = RandomForestClassifier(random_state=0)
 y_score = clf.fit(X_train, y_train).predict_proba(X_test)
@@ -954,37 +960,108 @@ print(classification_report(y_test,y_pred))
 
 def train_test_split_B_NK_T_multi(all_df_edit, list_omi_parameters):
     #extracts classes from variable of interest (here it's cell type)
-    classes = all_df_edit.Cell_Type.unique()
-    factor = pd.factorize(all_df_edit.Cell_Type)
     
-    # make new column with labels for each class
-    all_df_edit.loc[:, 'CT_LABELS'] = factor[0]
-    definitions = factor[1]
+    classes = {cell_type: idx for idx, cell_type in enumerate(all_df_edit['Cell_Type'].unique())}   
+    # classes = {'B-Cells': 0, 'NK-Cells': 1, 'T-Cells': 2}
     
-    ## B NK
-    df_bnk = all_df_edit[all_df_edit['Cell_Type'].isin(['B-Cells', 'NK-Cells'])]
-    X = df_bnk[list_omi_parameters] 
-    y = df_bnk['CT_LABELS'].values
-    #Designate train/test data, random forest classifier
-    X_train_bnk, X_test_bnk, y_train_bnk, y_test_bnk = train_test_split(X, y, test_size=0.30, random_state=0)
-    print(f"B split: {len(X_train_bnk)} y_train {len(y_train_bnk)}  x_test {len(X_test_bnk)}  y_test {len(y_test_bnk)}")
+    #######IMPLEMENTATION 1 70:30 split on all the data
+    # df = all_df_edit
+    # df['CT_LABELS'] = df['Cell_Type'].map(classes)
+    # X = df[list_omi_parameters] 
+    # y = df['CT_LABELS'].values
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0, shuffle=True)
+    # print(f"All data split: {len(X_train)} y_train {len(y_train)}  x_test {len(X_test)}  y_test {len(y_test)}")
+    # print(pd.Series(y_test).value_counts())
     
-    ## T
-    df_t = all_df_edit[all_df_edit['Cell_Type'].isin(['T-Cells'])]
-    X = df_t[list_omi_parameters] 
-    y = df_t['CT_LABELS'].values
-    #Designate train/test data, random forest classifier
-    X_train_t, X_test_t, y_train_t, y_test_t = train_test_split(X, y, test_size=0.50, random_state=0)
-    print(f"T split: {len(X_train_t)} y_train {len(y_train_t)}  x_test {len(X_test_t)}  y_test {len(y_test_t)}")
+    # y_train = pd.Series(y_train)
+    # y_test = pd.Series(y_test)
+    
+    #######IMPLEMENTATION 2 70:30 B and NK  | 50:50 T cells
+    
+    # df_b = all_df_edit[all_df_edit['Cell_Type'].isin(['B-Cells'])]
+    # df_b = shuffle(df_b, random_state=0)
+    
+    # df_nk = all_df_edit[all_df_edit['Cell_Type'].isin(['NK-Cells'])]
+    # df_nk = shuffle(df_nk, random_state=0)
+    
+    # df_t = all_df_edit[all_df_edit['Cell_Type'].isin(['T-Cells'])]
+    # df_t = shuffle(df_t, random_state=0)
+    
+    # # split into training and testing
+    # idx_b_split = int(np.floor(len(df_b) * 0.7))
+    # idx_nk_split = int(np.floor(len(df_nk) * 0.7))
+    # idx_t_split = int(np.floor(len(df_t) * 0.7))
+    
+    # # train
+    # df_train = pd.concat([df_b[:idx_b_split], 
+    #                       df_nk[:idx_nk_split], 
+    #                       df_t[:idx_t_split]], 
+    #                      ignore_index=True)
+    # print("train group\n", df_train.groupby(by=['Cell_Type'])['Cell_Type'].count())
+    # df_train['CT_LABELS'] = df_train['Cell_Type'].map(classes)
+    
+    # # test
+    # df_test = pd.concat([df_b[idx_b_split:],
+    #                      df_nk[idx_nk_split:],
+    #                      df_t[idx_t_split:]],
+    #                     ignore_index=True)
+    # print("test group\n", df_test.groupby(by=['Cell_Type'])['Cell_Type'].count())
+    # df_test['CT_LABELS'] = df_test['Cell_Type'].map(classes)
+    # print("test group\n", df_test.groupby(by=['CT_LABELS'])['CT_LABELS'].count())
+    
+    # # ### merge train test datasets
+    # X_train = df_train[list_omi_parameters]
+    # X_test = df_test[list_omi_parameters]
+    # y_train = df_train['CT_LABELS']
+    # y_test = df_test['CT_LABELS']
+    ############################
+    
+    # return  X_train, X_test, y_train, y_test, classes
+   
+    #######IMPLEMENTATION 3  70:30 B and NK  | 50:50 T cells
+    # Format {cell_type : test_size}
+    data_splits = {'B-Cells': 0.5 , 'NK-Cells' : 0.5, 'T-Cells' : 0.5}
+    
+    # placeholders
+    X_train_all = None
+    X_test_all = None
+    y_train_all = None
+    y_test_all = None
+    
+    for cell_type, test_size in data_splits.items():
+        pass
+        df_split = all_df_edit[all_df_edit['Cell_Type'] == cell_type].copy()
+        df_split = shuffle(df_split, random_state=0)
+        # df_split = df_split.head(696)
+        X = df_split[list_omi_parameters] 
+        
+        # df_split.groupby(by=['Cell_Type','Type_Activation'])['CT_LABELS'].count()
+        
+        df_split['CT_LABELS'] = df_split['Cell_Type'].map(classes)
+        y = df_split['CT_LABELS'].values
+        #Designate train/test data, random forest classifier
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0, shuffle=True)
+        print(f"{cell_type} split: {len(X_train)} y_train {len(y_train)}  x_test {len(X_test)}  y_test {len(y_test)}")
+        
+        if X_train_all is None:
+            X_train_all = X_train
+            X_test_all = X_test
+            y_train_all = y_train
+            y_test_all = y_test
+        else:
+            X_train_all = pd.concat([X_train_all, X_train], ignore_index=True)
+            X_test_all = pd.concat([X_test_all, X_test], ignore_index=True)
+            y_train_all = np.concatenate([y_train_all, y_train])
+            y_test_all = np.concatenate([y_test_all, y_test])
+    
+    return  X_train_all, X_test_all, pd.Series(y_train_all), pd.Series(y_test_all), classes
 
-    
-    ### merge train test datasets
-    X_train = pd.concat([X_train_bnk, X_train_t ])
-    X_test = pd.concat([X_test_bnk, X_test_t])
-    y_train = np.concatenate([y_train_bnk, y_train_t])
-    y_test = np.concatenate([y_test_bnk, y_test_t])
-    
-    return  X_train, X_test, y_train, y_test, classes, definitions
+
+### options  
+# same size dataframe (throw away data, keep 696 from smallest dataset)
+# unbalaned training : balanced test
+# balanced training : unbalanced test
+
 #%% Section 5 - Cell Type Classifier
 # SF6_C confusion matrix
 
@@ -995,7 +1072,6 @@ print('All cell data cell type classifier')
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 # F5 E accuracies
-
 # list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
 # # # # # # # # # ##### Top variables
@@ -1010,25 +1086,25 @@ list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FA
    
 #Make copy of main data frame, pull out OMI variables we want in classifier
 all_df_edit = all_df.copy()
-X_train, X_test, y_train, y_test, classes, definitions = train_test_split_B_NK_T_multi(all_df_edit, list_omi_parameters)
+X_train, X_test, y_train, y_test, classes = train_test_split_B_NK_T_multi(all_df_edit, list_omi_parameters)
 
+# df_y_test = pd.DataFrame(y_train, columns=['label']).value_counts()
+# df_y_test.groupby(by=['label']).count()
 #########
-
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test = scaler.fit_transform(X_test)
-clf = RandomForestClassifier(random_state=0, class_weight=None)
+clf = RandomForestClassifier(random_state=0)
 clf.fit(X_train, y_train)
 y_pred = clf.predict(X_test)
 
-
 #Generate and print confusion matrix
-reversefactor = dict(zip(range(len(classes)), definitions))
-y_test = np.vectorize(reversefactor.get)(y_test)
-y_pred = np.vectorize(reversefactor.get)(y_pred)
-print("SF6_C   | T B and NK cells")
-# cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'], normalize='columns')*100
-# print(cm_table)
+classes_idx_class = {v:k for k,v in classes.items()}
+y_test = y_test.map(classes_idx_class)
+y_test = y_test.reset_index(drop=True)
+y_pred = pd.Series(y_pred).map(classes_idx_class)
+
+print("SF6_C | T B and NK cells")
 cm_table = pd.crosstab(y_test, y_pred, rownames=['Actual Condition'], colnames=['Predicted Condition'])
 print(cm_table)
 
@@ -1081,7 +1157,7 @@ print('All cell data cell type classifier - Quiescent cells only')
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
 
-X_train, X_test, y_train, y_test, classes, definitions = train_test_split_B_NK_T_multi(all_df_qonly, list_omi_parameters)
+X_train, X_test, y_train, y_test, classes = train_test_split_B_NK_T_multi(all_df_qonly, list_omi_parameters)
 
 # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
 
@@ -1095,9 +1171,15 @@ clf = RandomForestClassifier(random_state=0, class_weight=None)
 clf.fit(X_train, y_train)
 y_pred = clf.predict(X_test)
 
-reversefactor = dict(zip(range(len(classes)), definitions))
-y_test = np.vectorize(reversefactor.get)(y_test)
-y_pred = np.vectorize(reversefactor.get)(y_pred)
+# reversefactor = dict(zip(range(len(classes)), definitions))
+# y_test = np.vectorize(reversefactor.get)(y_test)
+# y_pred = np.vectorize(reversefactor.get)(y_pred)
+
+classes_idx_class = {v:k for k,v in classes.items()}
+y_test = y_test.map(classes_idx_class)
+y_test = y_test.reset_index(drop=True)
+y_pred = pd.Series(y_pred).map(classes_idx_class)
+
 
 if len(list_omi_parameters) == 9:
     print("+"*20)
@@ -1152,49 +1234,45 @@ list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FA
 all_df_edit = all_df.copy()
 #########
 
+classes = {cell_type: idx for idx, cell_type in enumerate(all_df_edit['Type_Activation'].unique())}
 
-# all_df_edit = all_df_edit[list_omi_parameters]
+data_splits = {'B-Cells': 0.5 , 'NK-Cells' : 0.5, 'T-Cells' : 0.5}
 
-# classes = all_df.Cell_Type.unique()
-# factor = pd.factorize(all_df.Cell_Type)
+# placeholders
+X_train_all = None
+X_test_all = None
+y_train_all = None
+y_test_all = None
 
-# # make new column with labels for each class
-# all_df['CT_LABELS'] = factor[0]
-# definitions = factor[1]
+for cell_type, test_size in data_splits.items():
+    pass
+    df_split = all_df_edit[all_df_edit['Cell_Type'] == cell_type].copy()
+    df_split = shuffle(df_split, random_state=0)
+    # df_split = df_split.head(696)
+    X = df_split[list_omi_parameters] 
+    
+    
+    df_split['CT_LABELS'] = df_split['Type_Activation'].map(classes)
+    y = df_split['CT_LABELS'].values
+    #Designate train/test data, random forest classifier
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=0, shuffle=True)
+    print(f"{cell_type} split: {len(X_train)} y_train {len(y_train)}  x_test {len(X_test)}  y_test {len(y_test)}")
+    
+    if X_train_all is None:
+        X_train_all = X_train
+        X_test_all = X_test
+        y_train_all = y_train
+        y_test_all = y_test
+    else:
+        X_train_all = pd.concat([X_train_all, X_train], ignore_index=True)
+        X_test_all = pd.concat([X_test_all, X_test], ignore_index=True)
+        y_train_all = np.concatenate([y_train_all, y_train])
+        y_test_all = np.concatenate([y_test_all, y_test])
 
-classes = all_df_edit.Type_Activation.unique()
-factor = pd.factorize(all_df_edit.Type_Activation)
-all_df_edit['CT_LABELS'] = factor[0]
-definitions = factor[1]
-
-## B NK
-df_bnk = all_df_edit[all_df_edit['Cell_Type'].isin(['B-Cells', 'NK-Cells'])]
-X = df_bnk[list_omi_parameters] 
-y = df_bnk['CT_LABELS'].values
-#Designate train/test data, random forest classifier
-X_train_bnk, X_test_bnk, y_train_bnk, y_test_bnk = train_test_split(X, y, test_size=0.30, random_state=0)
-print(f"B split: {len(X_train_bnk)} y_train {len(y_train_bnk)}  x_test {len(X_test_bnk)}  y_test {len(y_test_bnk)}")
-
-## T
-df_t = all_df_edit[all_df_edit['Cell_Type'].isin(['T-Cells'])]
-X = df_t[list_omi_parameters] 
-y = df_t['CT_LABELS'].values
-#Designate train/test data, random forest classifier
-X_train_t, X_test_t, y_train_t, y_test_t = train_test_split(X, y, test_size=0.50, random_state=0)
-print(f"T split: {len(X_train_t)} y_train {len(y_train_t)}  x_test {len(X_test_t)}  y_test {len(y_test_t)}")
-
-### merge train test datasets
-X_train = pd.concat([X_train_bnk, X_train_t ])
-X_test = pd.concat([X_test_bnk, X_test_t])
-y_train = np.concatenate([y_train_bnk, y_train_t])
-y_test = np.concatenate([y_test_bnk, y_test_t])
-
-# classes = all_df.Type_Activation.unique()
-# factor = pd.factorize(all_df.Type_Activation)
-# all_df['CT_LABELS'] = factor[0]
-# definitions = factor[1]
-# X, y = all_df_edit, all_df['CT_LABELS'].values
-# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0)
+X_train = X_train_all
+X_test = X_test_all
+y_train =  pd.Series(y_train_all)
+y_test = pd.Series(y_test_all)
 
 ###############
 scaler = StandardScaler()
@@ -1203,15 +1281,17 @@ X_train = scaler.fit_transform(X_train)
 X_test = scaler.fit_transform(X_test)
 
 clf = RandomForestClassifier(random_state=0, class_weight=None)
-
 clf.fit(X_train, y_train)
-
 y_pred = clf.predict(X_test)
 
-reversefactor = dict(zip(range(len(classes)), definitions))
-y_test = np.vectorize(reversefactor.get)(y_test)
-y_pred = np.vectorize(reversefactor.get)(y_pred)
+# reversefactor = dict(zip(range(len(classes)), definitions))
+# y_test = np.vectorize(reversefactor.get)(y_test)
+# y_pred = np.vectorize(reversefactor.get)(y_pred)
 
+classes_idx_class = {v:k for k,v in classes.items()}
+y_test = y_test.map(classes_idx_class)
+y_test = y_test.reset_index(drop=True)
+y_pred = pd.Series(y_pred).map(classes_idx_class)
 
 print("+"*20)
 print("Figure SF8_B piechart of importance on all features")

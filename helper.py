@@ -128,7 +128,8 @@ def _train_test_split(df,
                      classes,
                      classes_col_name = 'Activation',
                      test_size = 0.30, 
-                     random_state=0):
+                     random_state=0,
+                     shuffle=True):
     
     df_data = df[list_cols]
     df_labels = df[classes_col_name]
@@ -140,7 +141,8 @@ def _train_test_split(df,
     X_train, X_test, y_train, y_test = train_test_split(X, 
                                                         y, 
                                                         test_size=test_size, 
-                                                        random_state=random_state)
+                                                        random_state=random_state,
+                                                        shuffle=True)
     y_train = y_train.flatten() # np.ravel(y_train) flatten returs a copy, ravel doesn't
     
     return deepcopy(X_train), deepcopy(X_test), deepcopy(y_train.flatten()), deepcopy(y_test.flatten())

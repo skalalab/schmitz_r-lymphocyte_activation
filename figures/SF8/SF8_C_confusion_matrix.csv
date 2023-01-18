@@ -1,7 +1,7 @@
 Actual Condition,B-Cells: CD69+,B-Cells: CD69-,NK-Cells: CD69+,NK-Cells: CD69-,T-Cells: CD69+,T-Cells: CD69-
-B-Cells: CD69+,122,7,2,1,0,0
-B-Cells: CD69-,12,206,7,6,0,0
-NK-Cells: CD69+,1,0,108,55,0,0
-NK-Cells: CD69-,0,0,2,201,0,0
-T-Cells: CD69+,3,5,0,0,135,41
-T-Cells: CD69-,1,6,1,0,0,156
+B-Cells: CD69+,210,15,4,1,1,2
+B-Cells: CD69-,24,340,0,6,0,2
+NK-Cells: CD69+,8,6,223,41,0,0
+NK-Cells: CD69-,0,6,29,298,0,0
+T-Cells: CD69+,0,0,0,0,171,6
+T-Cells: CD69-,0,0,0,0,5,166
