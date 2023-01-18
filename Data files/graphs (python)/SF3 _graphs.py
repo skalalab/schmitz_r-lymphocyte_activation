@@ -65,7 +65,7 @@ graph_titles = {
    "f.t1.mean": r"FAD $\tau_{1}$ (ps)",
    "f.t2.mean": r"FAD $\tau_{2}$ (ps)",
    "f.a1.mean": r"FAD $\alpha_{1}$ (%)",
-   "rr.mean": "Normalized Redeox Ratio\nNAD(P)H/[FAD+NAD(P)H]",
+   "rr.mean": "Normalized Redox Ratio\nNAD(P)H/[FAD+NAD(P)H]",
    "n.tm.mean": r"NAD(P)H $\tau_{m}$ (ps)",
    "f.tm.mean": r"FAD $\tau_{m}$ (ps)",
    "npix": r"Cell Size (# pixels)",
