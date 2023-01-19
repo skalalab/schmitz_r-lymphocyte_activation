@@ -17,19 +17,19 @@ import os
 #%% Section 2 - Read in and set up dataframe 
 
 #Read in dataframe    
-path_main = Path(r'Z:\Rebecca\lymphocyte data\NK cell repeats')
+path_main = Path(r'C:\Users\jriendeau\Documents\GitHub\schmitz_r-lymphocyte_activation\Data files\UMAPs, boxplots, ROC curves (Python)')
 path_save = Path(r'C:\Users\jriendeau\Documents\GitHub\schmitz_r-lymphocyte_activation\figures\F5')
 
-csv_path = path_main / 'all_data_including_new_nk_normalized_donor.csv'
+csv_path = path_main / 'JR.csv'
 all_df = pd.read_csv(csv_path)
 df_data = all_df.copy()
 
 order=("B-Cells: CD69-",
-       "B-Cells: CD69+",
-       "NK-Cells: CD69-",
-       "NK-Cells: CD69+",
-       "T-cells: CD69-",
-       "T-cells: CD69+")
+        "B-Cells: CD69+",
+        "NK-Cells: CD69-",
+        "NK-Cells: CD69+",
+        "T-Cells: CD69-",
+        "T-Cells: CD69+")
 
 #SET LIST
 x_variable = "Type_Activation"
@@ -37,12 +37,12 @@ y_variables = [
     ### LYMPHOCYTE PAPER VARIABLES#
         # "NADH_t1",
         # "NADH_t2",
-        # "NADH_a1",
+        "NADH_a1",
         # "FAD_t1",
         # "FAD_t2",
         # "FAD_a1",
         "Norm_RR",
-        # "NADH_tm",
+        "NADH_tm",
         # "FAD_tm",
         # "Cell_Size_Pix",
         # "Donor
@@ -89,15 +89,15 @@ for y_variable in y_variables:
     ax.spines.right.set_visible(False)
     ax.spines.top.set_visible(False)
     
-    add_stat_annotation(ax, data=all_df, x=x_variable, y=y_variable,order = order,
+    add_stat_annotation(ax, data=all_df, x=x_variable, y=y_variable, order = order,
                         box_pairs=[("B-Cells: CD69-","B-Cells: CD69+",), 
-                                   ("NK-Cells: CD69-","NK-Cells: CD69+"), 
-                                   ( "T-cells: CD69-","T-cells: CD69+"),
-                                   ("B-Cells: CD69-","T-cells: CD69-"),
-                                   ("B-Cells: CD69-","NK-Cells: CD69-"),
-                                   ("NK-Cells: CD69-","T-cells: CD69-"),
+                                    ("NK-Cells: CD69-","NK-Cells: CD69+"), 
+                                    ( "T-Cells: CD69-","T-Cells: CD69+"),
+                                    ("B-Cells: CD69-","T-Cells: CD69-"),
+                                    ("B-Cells: CD69-","NK-Cells: CD69-"),
+                                    ("NK-Cells: CD69-","T-Cells: CD69-"),
                                     
-                                   ],
+                                    ],
                         
                         test='Kruskal', 
                         text_format='star', 
