@@ -57,8 +57,6 @@ nk_df = pd.read_csv(path_nk_data)
 
 nk_df.groupby(['Group','Donor', 'Activation'])['rr.mean'].mean()
 
-
-
 path_nk_data = './Data files/UMAPs, boxplots, ROC curves (Python)/NK_donors_final_dec02.csv'
 nk_df = pd.read_csv(path_nk_data)
 
@@ -114,7 +112,8 @@ dict_classes = {label_int : label_class for label_int, label_class in enumerate(
 
 #%% Section 3 - Generate graph with all ROCs
 
-# F4 D and C
+# F4 D - ROC curve
+# F4 C - accuracies 
 list_top_vars = []
 
 dict_accuracies = {}
@@ -262,7 +261,7 @@ df_acc.to_csv('./figures/F4/F4_D_accuracies.csv')
 #%% Section 4 - donor color coding boxplots: Red/blue, all dots visible
 
 
-# Figure 3 FGHI
+# F3 FGHI
 
 dict_figures = {
             'F' : {
@@ -371,7 +370,8 @@ for fig_letter, fig_dict in dict_figures.items():
 
 #%% Section 5 - ROC curves: Random forest, Logistic Regression, SVM curves together
 
-#TODO SF4 F and CONFUSION MATRIX C,D,E
+# SF4 F 
+# SF4 C,D,E - CONFUSION MATRIX 
 
 class_weight = None 
 # class_weight = 'balanced'
@@ -439,7 +439,7 @@ plt.show()
 
 #%% Section 6 - NK cell activation UMAP
 
-# FIGURE 4 B
+# F4 B
 
 #list of parameters we want to use for the UMAP. I used ten OMI features (Normalized redox ratio, NAD(P)H lifetimes, FAD lifetimes, and cell size)
 
@@ -586,8 +586,8 @@ plot.output_backend = "svg"
 
 #Generate column in data frame that has both donor and activation status
 
-
-# SF 4 B 
+# SF4 B
+ 
 df_data = nk_df.copy()
 
 df_data['Donor_Activation'] = df_data['Donor'] + ': ' + df_data['Activation']
@@ -660,7 +660,7 @@ export_svgs(plot, filename = './figures/SF4/SF4_B_NKCell_Donor_ActStatus_umap.sv
 
 
 # NOTE THIS USES ALL THE DATA 
-# SF 4 A   
+# SF4 A   
 
 
 #Read in CSV that has data from all 4 combinations of activation/culture condition

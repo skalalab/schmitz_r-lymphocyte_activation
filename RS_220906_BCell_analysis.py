@@ -53,7 +53,10 @@ classes = ['CD69-', 'CD69+']
 dict_classes = {label_int : label_class for label_int, label_class in enumerate(classes)}
 #%% Section 4 - ROC curves for different variable combos plotted together
 
-#   FIGURE 2 
+# F2 D
+# F2 C -- feature importances
+# F2 D/ST1 - accuracies
+     
 #B-cell random forest classifiers
 
 sns.set(rc={'figure.figsize': (15, 15)})
@@ -255,7 +258,8 @@ plt.text((x1+x2)*.5, y+h, "****", ha='center', va='bottom', color=col, size = 40
 
 #%% Section 6 - ROC curves: Random forest, Logistic Regression, SVM 
 
-#  SF 2
+# SF2 F
+# SF2 CDE - confusion matrices
 
 sns.set(rc={'figure.figsize': (15, 15)})
 sns.set_style(style='white')
@@ -303,7 +307,7 @@ plt.xticks(fontsize = 36)
 plt.yticks(fontsize = 36)
 plt.title(f'SF2. B Cells | class_weight: {class_weight}', fontsize = 36)
 plt.legend(bbox_to_anchor=(-0.1,-0.1), loc="upper left", fontsize = 36)
-plt.savefig('./figures/SF2/SF2_RS_bcell_SVMLR_ROC.svg',dpi=350, bbox_inches='tight')
+plt.savefig('./figures/SF2/SF2_F_RS_bcell_SVMLR_ROC.svg',dpi=350, bbox_inches='tight')
 
 plt.show()
 
@@ -311,7 +315,7 @@ plt.show()
 
 #list of parameters we want to use for the UMAP. I used ten OMI features (Normalized redox ratio, NAD(P)H lifetimes, FAD lifetimes, and cell size)
 
-# F2_B Activation
+# F2 B Activation
 
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
@@ -328,7 +332,6 @@ reducer = umap.UMAP(
            )
        
 fit_umap = reducer.fit(scaled_data)
-
 
 ## additional params for holoviews
 #The legend_entries parameter will determine what group we are color-coding by
@@ -456,7 +459,7 @@ plot.output_backend = "svg"
 #%%  Section 9 - B-cell UMAP - by donor and activation 
 
 
-# SF2_B
+# SF2 B
 
 #Generate column in data frame that has both donor and activation status
 df_data['Donor_Activation'] = df_data['Donor'] + ': ' + df_data['Activation']
@@ -529,7 +532,7 @@ export_svgs(plot, filename = './figures/SF2/SF2_B_BCell_Donor_ActStatus_umap.svg
 #%%  Section 10 - B-cell data UMAP with all groups (Activated + Quiescent, CD69+ and CD69-)
 
 
-# SF2_A
+# SF2 A
 
 #Read in CSV that has data from all 4 combinations of activation/culture condition
 # allgroup_b_df = pd.read_csv('Z:/0-Projects and Experiments/RS - lymphocyte activation/data/B-cells (Donors 1-3)/Bcell_cyto_data.csv')
