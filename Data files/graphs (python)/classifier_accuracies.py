@@ -17,8 +17,8 @@ import numpy as np
 #%% Section 2 - Read in and set up dataframe 
 
 #Read in dataframe    
-path_main = Path(r'C:\Users\jriendeau\Documents\GitHub\schmitz_r-lymphocyte_activation\figures\F5')
-csv_path = path_main / 'F5_F_classifer_accuracies.csv'
+path_main = Path(r'C:\Users\jriendeau\Documents\GitHub\schmitz_r-lymphocyte_activation\figures\SF7')
+csv_path = path_main / 'SF7_B_classifier_accuracies.csv'
 
 saveas = os.path.abspath(csv_path).split('.')[0]
 
@@ -37,7 +37,7 @@ titles = {
    "FAD_t1": r"FAD $\tau_{1}$",
    "FAD_t2": r"FAD $\tau_{2}$",
    "FAD_a1": r"FAD $\alpha_{1}$",
-   "Norm_RR": "Redeox Ratio",
+   "Norm_RR": "Redox Ratio",
    "NADH_tm": r"NAD(P)H $\tau_{m}$",
    "FAD_tm": r"FAD $\tau_{m}$",
    }
@@ -65,8 +65,9 @@ plt.gcf().autofmt_xdate()
 plt.rcParams.update({'font.size': 12})
 
 ax = plt.gca()
-#ax.set_ylim([0, 100])
+ax.tick_params(axis="y", direction="out", reset=True, right=False)
 plt.yticks(np.arange(0, 110, 10))
+
 ax.spines['right'].set_visible(False)
 ax.spines['top'].set_visible(False)
 
