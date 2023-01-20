@@ -24,8 +24,9 @@ labCol_test <- c("Norm RR",
                  expression(paste("FAD ",tau[2])))
 
 #reads in organized data
-# mydata <- read.csv("Z:/Rebecca/Immune Cell Projects/Lymphocyte Paper/Paper data/AllCellData_hmap.csv", header=T)
-mydata <- read.csv("./Data files/ecg_feature_exports/all_data.csv", header=T)
+# mydata <- read.csv("./Data files/Heatmaps (R)/AllCellData_hmap.csv", header=T)
+mydata <- read.csv("./Data files/Heatmaps (R)/2023120_AllCellData_hmap.csv", header=T)
+
 
 all_cell <- mydata
 #computes means for each group within donor
@@ -49,7 +50,6 @@ row.hc <- hclust(dist(all_mean_s), method = "ward.D2")
 row.dd <- as.dendrogram(row.hc)
 weights.row <- c(1, 1, 1, 1, 1, 30, 100, 100, 100, 100, 100, 100, 10, 1, 1, 1, 1, 1, 200, 200, 200, 50, 50, 200)
 row.dd.reordered <- reorder(row.dd, wts=weights.row, agglo.FUN = mean)
-
 
 #Match numbers to donors/activation status
 all_mean$Activation <- ifelse(all_mean$Activation == 0, "CD69-","CD69+")

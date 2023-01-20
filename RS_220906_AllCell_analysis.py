@@ -168,9 +168,63 @@ df_data = all_df.copy()
 classes = ['CD69-', 'CD69+']
 dict_classes = {label_int : label_class for label_int, label_class in enumerate(classes)}
 
-
 d = str(date_today.year) + str(date_today.month).zfill(2) + str(date_today.day).zfill(2)
+
+
+all_df.groupby(by=['Cell_Type', 'Donor'])['count'].count()
+
+# replace T cell donor B for G
+all_df.loc[(all_df['Cell_Type'] == 'T-Cells') &  (all_df['Donor'] =='B'), 'Donor'] = 'G'
+
 all_df.to_csv(f"./Data files/ecg_feature_exports/{d}_all_data_including_new_nk_normalized_donor.csv", index=False)
+
+#%% export dataframe for heatmap
+
+heatmap_cols = ['Norm_RR', 
+                'NADH_tm',
+                'FAD_tm',
+                'NADH_a1',
+                'NADH_t1',
+                'NADH_t2',
+                'FAD_a1',
+                'FAD_t1',
+                'FAD_t2',
+                'Activation',
+                'Donor',
+                'Cell_Type'
+]
+
+df_heamap_all = all_df[heatmap_cols].copy()
+
+from datetime import datetime
+
+d = f"{datetime.now().year}{datetime.now().month}{datetime.now().day}"
+path_output_heatmap_csv = Path(r"./Data files\Heatmaps (R)")
+
+# map Donors and activation to numbers? 
+dict_activation = {'CD69-':0 , 'CD69+': 1}
+
+
+
+dict_donor = {'A': 1, 'B': 2, 'C': 3,# B cells
+              'D':4, 'M':5, 'N':6, # NK cells
+              'E': 7,'F':8,'G':9 } # T Cells
+dict_cell_type = {'B-Cells': 0 , 'NK-Cells': 1 , 'T-Cells': 3}
+
+
+# map values 
+df_heamap_all['Donor'] = df_heamap_all['Donor'].map(dict_donor)
+df_heamap_all['Activation'] = df_heamap_all['Activation'].map(dict_activation)
+df_heamap_all['Cell_Type'] = df_heamap_all['Cell_Type'].map(dict_cell_type)
+
+
+df_heamap_all.to_csv(path_output_heatmap_csv / f'{d}_AllCellData_hmap.csv')
+df_heamap_all.groupby(by=['Cell_Type','Donor'])['Cell_Type'].count()
+
+# compare with current data
+# df_hmap_csv = pd.read_csv(r"C:\Users\econtrerasguzman\Desktop\development\schmitz_r-lymphocyte_activation\Data files\Heatmaps (R)\AllCellData_hmap.csv")
+# df_hmap_csv.groupby(by=['Cell_Type','Donor'])['Cell_Type'].count()
+
 
 
 #%%
