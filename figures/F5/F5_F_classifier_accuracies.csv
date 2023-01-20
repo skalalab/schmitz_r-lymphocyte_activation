@@ -1,9 +1,9 @@
 labels,data
 All,0.900255754
-Top variable,0.504475703
-Top 2 variables,0.743606138
-Top 3 variables,0.812659847
+NAD(P)H variables,0.833120205
 Top 4 variables,0.831841432
-NADH_tm,0.833120205
+Top 3 variables,0.812659847
+Top 2 variables,0.743606138
+Top variable,0.504475703
 Norm_RR,0.370204604
 NADH_a1,
