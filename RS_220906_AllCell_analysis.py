@@ -171,7 +171,7 @@ dict_classes = {label_int : label_class for label_int, label_class in enumerate(
 d = str(date_today.year) + str(date_today.month).zfill(2) + str(date_today.day).zfill(2)
 
 
-all_df.groupby(by=['Cell_Type', 'Donor'])['count'].count()
+all_df.groupby(by=['Cell_Type','Activation'])['Cell_Type'].count()
 
 # replace T cell donor B for G
 all_df.loc[(all_df['Cell_Type'] == 'T-Cells') &  (all_df['Donor'] =='B'), 'Donor'] = 'G'
@@ -220,10 +220,6 @@ df_heamap_all['Cell_Type'] = df_heamap_all['Cell_Type'].map(dict_cell_type)
 
 df_heamap_all.to_csv(path_output_heatmap_csv / f'{d}_AllCellData_hmap.csv')
 df_heamap_all.groupby(by=['Cell_Type','Donor'])['Cell_Type'].count()
-
-# compare with current data
-# df_hmap_csv = pd.read_csv(r"C:\Users\econtrerasguzman\Desktop\development\schmitz_r-lymphocyte_activation\Data files\Heatmaps (R)\AllCellData_hmap.csv")
-# df_hmap_csv.groupby(by=['Cell_Type','Donor'])['Cell_Type'].count()
 
 
 
