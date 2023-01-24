@@ -180,7 +180,7 @@ from pathlib import Path
 
 
 
-#%% Section 1
+#%% Section 2
 path_datasets = Path(r"./data/UMAPs, boxplots, ROC curves (Python)")
 all_df = pd.read_csv(path_datasets / 'all_data.csv')
 
@@ -211,7 +211,7 @@ def train_test_split_B_NK_T(df_data, list_cols):
     return  X_train, X_test, y_train, y_test
 #####
 
-#%% export dataframe for heatmap
+#%% INTERMEDIATE - exports dataframe for heatmap
 
 heatmap_cols = ['Norm_RR', 
                 'NADH_tm',
@@ -251,10 +251,10 @@ df_heamap_all['Activation'] = df_heamap_all['Activation'].map(dict_activation)
 df_heamap_all['Cell_Type'] = df_heamap_all['Cell_Type'].map(dict_cell_type)
 
 
-df_heamap_all.to_csv(path_output_heatmap_csv / f'{d}_AllCellData_hmap.csv')
+df_heamap_all.to_csv(path_output_heatmap_csv / f'AllCellData_hmap.csv')
 
 
-#%% Section 4 - All cell activation classifier ROCs - Plot all curves together 
+#%% Section 3 - All cell activation classifier ROCs - Plot all curves together 
 
 #TODO FIGURE 5 D
 
@@ -406,7 +406,7 @@ df_acc = pd.DataFrame(dict_accuracies, index=[0])
 df_acc.to_csv('./figures/SF5/SF5_B_accuracies.csv')
 
 
-#%% Section 5 - All cell activation classifier - Random forest, Logistic, SVM ROCs - Plot all curves together
+#%% Section 4 - All cell activation classifier - Random forest, Logistic, SVM ROCs - Plot all curves together
 
 #TODO SF5 D, CONFUSION MATRICES E,F,G
 
@@ -462,7 +462,7 @@ plt.savefig('./figures/SF5/SF5_D_RS_allcell_SVMLR_ROC.svg',dpi=350, bbox_inches=
 
 plt.show()
 
-#%% Section 6 - UMAP of activation status
+#%% Section 5 - UMAP of activation status
 
 # SF5 A
  
@@ -535,7 +535,7 @@ plot.output_backend = "svg"
 export_svgs(plot, filename = './figures/SF5/SF5_A_AllCell_ActStatus_umap.svg')
 # hv.save(overlay, './figures/AllCell_ActStatus_umap.svg')
 
-#%% Section 7 - UMAP of cell type
+#%% Section 6 - UMAP of cell type
 
 # SF6 A 
 
@@ -605,7 +605,7 @@ plot.output_backend = "svg"
 export_svgs(plot, filename = './figures/SF6/SF6_A_AllCell_CellType_umap.svg')
 # hv.save(overlay, 'AllCell_CellType_umap.svg')
 
-#%% Setion 8 - UMAP of cell type (QUIESCENT ONLY)
+#%% Setion 7 - UMAP of cell type (QUIESCENT ONLY)
 
 # SF7_A
 #Same structure as Section 6 - see comments for more detail 
@@ -674,8 +674,7 @@ plot.output_backend = "svg"
 export_svgs(plot, filename = './figures/SF7/SF7_A_AllCell_CellType_QuiOnly_umap.svg')
 # hv.save(overlay, 'AllCell_CellType_QuiOnly_umap.svg')
 
-#%% Section 9 - UMAP of cell type + activation status
-
+#%% Section 8 - UMAP of cell type + activation status
 
 # F5_C
 
@@ -747,7 +746,7 @@ export_svgs(plot, filename = './figures/F5/F5_C_AllCell_CellType_ActStatus_umap.
 
 
 
-#%% Section 10 - UMAP of cell type color-coded by donor
+#%% NO FIGURE  UMAP of cell type color-coded by donor
 
 
 # NOT a FIGURE in paper 
@@ -821,7 +820,7 @@ plot = hv.render(overlay)
 plot.output_backend = "svg"
 export_svgs(plot, filename = './figures/NF_AllCell_CellType_Donor_umap.svg')
 # hv.save(overlay, 'AllCell_CellType_Donor_umap.svg')
-#%% Section 11 - UMAP of activation status color-coded by donor
+#%% Section 9 - UMAP of activation status color-coded by cell type, donor and activation status
 
 # SF8_A
 
@@ -943,50 +942,49 @@ def calculate_roc_rf(rf_df, key='Activation'):
 
 # df_data = all_df.copy()
 
-#%% Section 4 - All cell activation classifier
+#%%  All cell activation classifier
 
+# # NO FIGURE in paper
+# print('All cell activation classifier')
 
-# NO FIGURE in paper
-print('All cell activation classifier')
-
-#List of OMI variables we want in the classifier (**Make sure Activation is last item in list)
-list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR',  'Activation'] # , 'Cell_Size_Pix'
+# #List of OMI variables we want in the classifier (**Make sure Activation is last item in list)
+# list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR',  'Activation'] # , 'Cell_Size_Pix'
 
    
-#Make copy of main data frame, pull out OMI variables we want in classifier
-all_df_edit = all_df.copy()
-all_df_edit = all_df_edit[list_omi_parameters]
-classes = ['CD69-', 'CD69+']
+# #Make copy of main data frame, pull out OMI variables we want in classifier
+# all_df_edit = all_df.copy()
+# all_df_edit = all_df_edit[list_omi_parameters]
+# classes = ['CD69-', 'CD69+']
 
 
-#Split training/testing data, random forest classifier
-X, y = all_df_edit.iloc[:,:-1], all_df_edit[['Activation']]
-y = label_binarize(y, classes=classes)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0, shuffle=True)
-y_train = np.ravel(y_train)
-clf = RandomForestClassifier(random_state=0)
-y_score = clf.fit(X_train, y_train).predict_proba(X_test)
-y_pred = clf.fit(X_train, y_train).predict(X_test)
+# #Split training/testing data, random forest classifier
+# X, y = all_df_edit.iloc[:,:-1], all_df_edit[['Activation']]
+# y = label_binarize(y, classes=classes)
+# X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=0, shuffle=True)
+# y_train = np.ravel(y_train)
+# clf = RandomForestClassifier(random_state=0)
+# y_score = clf.fit(X_train, y_train).predict_proba(X_test)
+# y_pred = clf.fit(X_train, y_train).predict(X_test)
 
-#Calculate and display confusion matrix
-factor = pd.factorize(all_df_edit[['Activation']].squeeze())
-definitions = factor[1]
-reversefactor = dict(zip(range(5), definitions))
-y_test_rf = np.vectorize(reversefactor.get)(y_test)
-y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
-print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition']))
+# #Calculate and display confusion matrix
+# factor = pd.factorize(all_df_edit[['Activation']].squeeze())
+# definitions = factor[1]
+# reversefactor = dict(zip(range(5), definitions))
+# y_test_rf = np.vectorize(reversefactor.get)(y_test)
+# y_pred_rf = np.vectorize(reversefactor.get)(y_pred)
+# print(pd.crosstab(np.ravel(y_test_rf), y_pred_rf, rownames=['Actual Condition'], colnames=['Predicted Condition']))
 
-#Print features with weight in classifier
-for col, feature in zip(np.flip(all_df_edit.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
-    print(col, clf.feature_importances_[feature])
+# #Print features with weight in classifier
+# for col, feature in zip(np.flip(all_df_edit.columns[np.argsort(clf.feature_importances_)]), np.flip(np.argsort(clf.feature_importances_))):
+#     print(col, clf.feature_importances_[feature])
 
-#Generate ROC curve
-omi_params_umap = all_df_edit.copy()
-calculate_roc_rf(omi_params_umap)    
+# #Generate ROC curve
+# omi_params_umap = all_df_edit.copy()
+# calculate_roc_rf(omi_params_umap)    
 
-#Print metrics to assess classifier performance
-print('Accuracy score =', accuracy_score(y_test, y_pred))
-print(classification_report(y_test,y_pred))
+# #Print metrics to assess classifier performance
+# print('Accuracy score =', accuracy_score(y_test, y_pred))
+# print(classification_report(y_test,y_pred))
 
 
 #%%
@@ -1035,7 +1033,7 @@ def train_test_split_B_NK_T_multi(all_df_edit, list_omi_parameters):
 
 
 
-#%% Section 5 - Cell Type Classifier
+#%% Section 10 - Cell Type Classifier
 # SF6_C confusion matrix
 
 print('All cell data cell type classifier')
@@ -1094,7 +1092,7 @@ if len(list_omi_parameters) == 9:
 print('Accuracy score =', accuracy_score(y_test, y_pred))
 # print(classification_report(y_test,y_pred))
 
-#%% Section 6 - Cell type classifer (QUIESCENT ONLY)
+#%% Section 11 - Cell type classifer (QUIESCENT ONLY)
 
 #TODO SF7 D confusion matrix and pie chart
 
@@ -1180,7 +1178,7 @@ if len(list_omi_parameters) == 9:
 print('Accuracy score =', accuracy_score(y_test, y_pred))
 # print(classification_report(y_test,y_pred))
 
-#%% Section 7 - Cell type + activation classifier
+#%% Section 12 - Cell type + activation classifier
 
 #TODO SF8 C
 
