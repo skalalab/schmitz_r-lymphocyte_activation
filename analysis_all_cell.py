@@ -43,155 +43,173 @@ from helper import run_analysis_on_classifier, _train_test_split
 from datetime import date 
 date_today = date.today()
 from pathlib import Path
-#%% INTERMEDIATE SECTION --> B cell data and appends T and NK data 
+#%% INTERMEDIATE SECTION --> loads B cell data and appends T and NK data into a single CSV file 
 
-#Read in dataframe    
+# #Read in dataframe    
 
-path_datasets = Path(r"./data/UMAPs, boxplots, ROC curves (Python)")
-all_df = pd.read_csv(path_datasets / 'archive' /'B_cell_data.csv')
-all_df['count'] = 1
-all_df.groupby(['Cell_Type','Activation'])['count'].count()
-
-#####
-cols_to_keep = ['NADH_t1',
-                'NADH_t2',
-                'NADH_a1',
-                'FAD_t1',
-                'FAD_t2',
-                'FAD_a1',
-                'Norm_RR',
-                'NADH_tm',
-                'FAD_tm',
-                'Donor',
-                'Activation',
-                'Cell_Type']
-
-##%% Add T cell data
-
-df_t_cells_labeled = pd.read_csv(path_datasets / 'CD3Test_CD69labeled.csv')
-df_t_cells_labeled.groupby(by=["Donor",'Activation'])['RR'].mean()
-
-for donor in df_t_cells_labeled['Donor'].unique():
-    pass
-    mean_control_rr = df_t_cells_labeled[(df_t_cells_labeled['Donor'] == donor)&
-                                  (df_t_cells_labeled['Activation']==0)]['RR'].mean()
-    df_t_cells_labeled.loc[df_t_cells_labeled['Donor'] == donor,
-                            'RR'] = (df_t_cells_labeled.loc[df_t_cells_labeled['Donor'] == donor,'RR'] / mean_control_rr)
-
-df_t_cells_labeled.groupby(by=["Donor",'Activation'])['RR'].mean()
-
-## fix labeling of values
-activation_status= {0 : "CD69-", 1: "CD69+"}
-df_t_cells_labeled['Activation'] = df_t_cells_labeled['Activation'].map(activation_status)
-
-donor_label= {2 : "B", 5: "E", 6: "F"}
-df_t_cells_labeled['Donor'] = df_t_cells_labeled['Donor'].map(donor_label)
-
-df_t_cells_labeled['Cell_Type'] = 'T-Cells'
-
-# rename columns 
-df_t_cells_labeled = df_t_cells_labeled.rename(columns={'Nt1' : 'NADH_t1', 
-                                                        'Nt2' : 'NADH_t2', 
-                                                        'Na1' : 'NADH_a1', 
-                                                        'Ntm' : 'NADH_tm', 
-                                                        'Ft1' : 'FAD_t1', 
-                                                        'Ft2' : 'FAD_t2',
-                                                        'Fa1' : 'FAD_a1', 
-                                                        'RR' : 'Norm_RR', 
-                                                        'Ftm' : 'FAD_tm', 
-                                                        })
-
-df_t_cells_labeled.groupby(by=["Donor",'Activation'])['Norm_RR'].mean()
-## END NORMALIZING AND FORMATTING T CELL DATA
-
-df_t_cells_labeled['count'] = 1
-
-# Remove T cell data if any
-# all_df = all_df[all_df['Cell_Type'] != 'T-cells']
-all_df = pd.concat([all_df[cols_to_keep], df_t_cells_labeled[cols_to_keep]])
-
+# path_datasets = Path(r"./data/UMAPs, boxplots, ROC curves (Python)")
+# all_df = pd.read_csv(path_datasets / 'archive' /'B_cell_data.csv')
+# all_df['count'] = 1
 # all_df.groupby(['Cell_Type','Activation'])['count'].count()
 
+# cols_to_keep = ['NADH_t1',
+#                 'NADH_t2',
+#                 'NADH_a1',
+#                 'FAD_t1',
+#                 'FAD_t2',
+#                 'FAD_a1',
+#                 'Norm_RR',
+#                 'NADH_tm',
+#                 'FAD_tm',
+#                 'Donor',
+#                 'Activation',
+#                 'Cell_Type']
 
-##%% append NK Data
+# ##%% Add T cell data
+# df_t_cells_labeled = pd.read_csv(path_datasets / 'CD3Test_CD69labeled.csv')
+# df_t_cells_labeled.groupby(by=["Donor",'Activation'])['RR'].mean()
 
-# remove NK data if any
-all_df = all_df[all_df['Cell_Type'] != 'NK-Cells']
+# for donor in df_t_cells_labeled['Donor'].unique():
+#     pass
+#     mean_control_rr = df_t_cells_labeled[(df_t_cells_labeled['Donor'] == donor)&
+#                                   (df_t_cells_labeled['Activation']==0)]['RR'].mean()
+#     df_t_cells_labeled.loc[df_t_cells_labeled['Donor'] == donor,
+#                             'RR'] = (df_t_cells_labeled.loc[df_t_cells_labeled['Donor'] == donor,'RR'] / mean_control_rr)
 
-# load new nk cells 
-df_nk = pd.read_csv('data/UMAPs, boxplots, ROC curves (Python)/NK_cells_dataset.csv')
-df_nk = df_nk.rename(columns={'n.t1.mean' : 'NADH_t1', 
-                              'n.t2.mean' : 'NADH_t2', 
-                              'n.a1.mean' : 'NADH_a1', 
-                              'n.tm.mean' : 'NADH_tm', 
-                              'f.t1.mean' : 'FAD_t1', 
-                              'f.t2.mean' : 'FAD_t2',
-                              'f.a1.mean' : 'FAD_a1', 
-                              'rr.mean' : 'Norm_RR', 
-                              'f.tm.mean' : 'FAD_tm', 
-                              'npix' : 'Cell_Size_Pix'
-                              })
+# df_t_cells_labeled.groupby(by=["Donor",'Activation'])['RR'].mean()
 
-# normalize NK cells to donor
-for donor in df_nk['Donor'].unique():
-    pass 
-    mean_control = df_nk[(df_nk['Donor'] == donor) & 
-                         (df_nk['Group'] == "Control")&
-                          (df_nk['Activation'] == "CD69-")
-                             ]["Norm_RR"].mean()
-    df_nk.loc[(df_nk['Donor'] == donor),'Norm_RR'] = (df_nk.loc[(df_nk['Donor'] == donor),'Norm_RR'] / mean_control)
+# ## fix labeling of values
+# activation_status= {0 : "CD69-", 1: "CD69+"}
+# df_t_cells_labeled['Activation'] = df_t_cells_labeled['Activation'].map(activation_status)
 
-# print("+" * 20)
-df_nk.groupby(['Donor','Group', 'Activation'])['Norm_RR'].mean()
+# donor_label= {2 : "B", 5: "E", 6: "F"}
+# df_t_cells_labeled['Donor'] = df_t_cells_labeled['Donor'].map(donor_label)
 
+# df_t_cells_labeled['Cell_Type'] = 'T-Cells'
 
-# keep only Activated CD69+ and Unactivated CD69-
-df_nk = df_nk[((df_nk['Group']=='Activated') & (df_nk['Activation']=='CD69+')) | 
-               ((df_nk['Group']=='Control') & (df_nk['Activation']=='CD69-'))
-               ]
+# # rename columns 
+# df_t_cells_labeled = df_t_cells_labeled.rename(columns={'Nt1' : 'NADH_t1', 
+#                                                         'Nt2' : 'NADH_t2', 
+#                                                         'Na1' : 'NADH_a1', 
+#                                                         'Ntm' : 'NADH_tm', 
+#                                                         'Ft1' : 'FAD_t1', 
+#                                                         'Ft2' : 'FAD_t2',
+#                                                         'Fa1' : 'FAD_a1', 
+#                                                         'RR' : 'Norm_RR', 
+#                                                         'Ftm' : 'FAD_tm', 
+#                                                         })
 
-df_nk.groupby(['Donor','Group', 'Activation'])['Cell_Type'].count()
+# df_t_cells_labeled.groupby(by=["Donor",'Activation'])['Norm_RR'].mean()
+# ## END NORMALIZING AND FORMATTING T CELL DATA
 
-## Concat dicts
-df_concat = pd.concat([all_df[cols_to_keep],df_nk[cols_to_keep]])
-df_concat['Donor'].unique()
-df_concat['Cell_Type'].unique()
+# df_t_cells_labeled['count'] = 1
 
-all_df = df_concat
+# # Remove T cell data if any
+# # all_df = all_df[all_df['Cell_Type'] != 'T-cells']
+# all_df = pd.concat([all_df[cols_to_keep], df_t_cells_labeled[cols_to_keep]])
 
-##%%%
-# print(all_df.groupby(by=['Cell_Type','Group','Activation',])['Cell_Size_Pix'].count())
-print("*" * 20)
-print(all_df.groupby(by=['Cell_Type','Donor','Activation'])['Norm_RR'].mean())
-print(all_df.groupby(by=['Cell_Type','Activation'])['Norm_RR'].count())
-
-#Add combination variables to data set
-# all_df.drop(['NADH', 'Group', 'Experiment_Date'], axis=1, inplace=True)
-all_df['Type_Activation'] = all_df['Cell_Type'] + ': ' + all_df['Activation']
-all_df['Donor_Activation'] = all_df['Cell_Type'] +' '+ all_df['Donor'] + ': ' + all_df['Activation']
-all_df['Donor_CellType'] = all_df['Donor'] + ': ' + all_df['Cell_Type'] 
-
-df_data = all_df.copy()
-
-##%% # SF5
-classes = ['CD69-', 'CD69+']
-dict_classes = {label_int : label_class for label_int, label_class in enumerate(classes)}
-
-d = str(date_today.year) + str(date_today.month).zfill(2) + str(date_today.day).zfill(2)
+# # all_df.groupby(['Cell_Type','Activation'])['count'].count()
 
 
-all_df.groupby(by=['Cell_Type','Activation'])['Cell_Type'].count()
+# ##%% append NK Data
 
-# Create unique labels for T cell donor B
-all_df.loc[(all_df['Cell_Type'] == 'T-Cells') &  (all_df['Donor'] =='B'), 'Donor'] = 'G'
+# # remove NK data if any
+# all_df = all_df[all_df['Cell_Type'] != 'NK-Cells']
 
-all_df.to_csv(f"./data/UMAPs, boxplots, ROC curves (Python)/all_data.csv", index=False)
+# # load new nk cells 
+# df_nk = pd.read_csv('data/UMAPs, boxplots, ROC curves (Python)/NK_cells_dataset.csv')
+# df_nk = df_nk.rename(columns={'n.t1.mean' : 'NADH_t1', 
+#                               'n.t2.mean' : 'NADH_t2', 
+#                               'n.a1.mean' : 'NADH_a1', 
+#                               'n.tm.mean' : 'NADH_tm', 
+#                               'f.t1.mean' : 'FAD_t1', 
+#                               'f.t2.mean' : 'FAD_t2',
+#                               'f.a1.mean' : 'FAD_a1', 
+#                               'rr.mean' : 'Norm_RR', 
+#                               'f.tm.mean' : 'FAD_tm', 
+#                               'npix' : 'Cell_Size_Pix'
+#                               })
+
+# # normalize NK cells to donor
+# for donor in df_nk['Donor'].unique():
+#     pass 
+#     mean_control = df_nk[(df_nk['Donor'] == donor) & 
+#                           (df_nk['Group'] == "Control")&
+#                           (df_nk['Activation'] == "CD69-")
+#                               ]["Norm_RR"].mean()
+#     df_nk.loc[(df_nk['Donor'] == donor),'Norm_RR'] = (df_nk.loc[(df_nk['Donor'] == donor),'Norm_RR'] / mean_control)
+
+# # print("+" * 20)
+# df_nk.groupby(['Donor','Group', 'Activation'])['Norm_RR'].mean()
+
+
+# # keep only Activated CD69+ and Unactivated CD69-
+# df_nk = df_nk[((df_nk['Group']=='Activated') & (df_nk['Activation']=='CD69+')) | 
+#                 ((df_nk['Group']=='Control') & (df_nk['Activation']=='CD69-'))
+#                 ]
+
+# df_nk.groupby(['Donor','Group', 'Activation'])['Cell_Type'].count()
+
+# ## Concat dicts
+# df_concat = pd.concat([all_df[cols_to_keep],df_nk[cols_to_keep]])
+# df_concat['Donor'].unique()
+# df_concat['Cell_Type'].unique()
+
+# all_df = df_concat
+
+# ##%%%
+# # print(all_df.groupby(by=['Cell_Type','Group','Activation',])['Cell_Size_Pix'].count())
+# print("*" * 20)
+# print(all_df.groupby(by=['Cell_Type','Donor','Activation'])['Norm_RR'].mean())
+# print(all_df.groupby(by=['Cell_Type','Activation'])['Norm_RR'].count())
+
+# #Add combination variables to data set
+# # all_df.drop(['NADH', 'Group', 'Experiment_Date'], axis=1, inplace=True)
+# all_df['Type_Activation'] = all_df['Cell_Type'] + ': ' + all_df['Activation']
+# all_df['Donor_Activation'] = all_df['Cell_Type'] +' '+ all_df['Donor'] + ': ' + all_df['Activation']
+# all_df['Donor_CellType'] = all_df['Donor'] + ': ' + all_df['Cell_Type'] 
+
+# df_data = all_df.copy()
+
+# d = str(date_today.year) + str(date_today.month).zfill(2) + str(date_today.day).zfill(2)
+
+# # Create unique labels for T cell donor B
+# all_df.loc[(all_df['Cell_Type'] == 'T-Cells') &  (all_df['Donor'] =='B'), 'Donor'] = 'G'
+
+# all_df.to_csv(f"./data/UMAPs, boxplots, ROC curves (Python)/all_data.csv", index=False)
 
 
 
-#%%
+#%% Section 1
 path_datasets = Path(r"./data/UMAPs, boxplots, ROC curves (Python)")
 all_df = pd.read_csv(path_datasets / 'all_data.csv')
+
+
+
+classes = ['CD69-', 'CD69+']
+dict_classes = {label_int : label_class for label_int, label_class in enumerate(classes)}
+df_data = all_df.copy()
+
+
+#### train test split function
+def train_test_split_B_NK_T(df_data, list_cols):
+    # B and NK 70:30 split
+    X_train, X_test, y_train, y_test = _train_test_split(df_data[df_data['Cell_Type'].isin(['B-Cells','NK-Cells',])], 
+                                                         list_cols, 
+                                                         classes, 
+                                                         test_size=0.5)
+    
+    # T 50:50 
+    X_train_t, X_test_t, y_train_t, y_test_t = _train_test_split(df_data[df_data['Cell_Type'].isin(['T-Cells',])], 
+                                                                 list_cols, 
+                                                                 classes, 
+                                                                 test_size=0.5)
+    X_train = pd.concat([X_train, X_train_t], ignore_index=True)
+    X_test = pd.concat([ X_test, X_test_t], ignore_index=True)
+    y_train =np.concatenate([y_train, y_train_t ])
+    y_test = np.concatenate([y_test, y_test_t ])
+    return  X_train, X_test, y_train, y_test
+#####
 
 #%% export dataframe for heatmap
 
@@ -214,7 +232,7 @@ df_heamap_all = all_df[heatmap_cols].copy()
 from datetime import datetime
 
 d = f"{datetime.now().year}{datetime.now().month}{datetime.now().day}"
-path_output_heatmap_csv = Path(r"./Data files\Heatmaps (R)")
+path_output_heatmap_csv = Path(r"./data\Heatmaps (R)")
 
 # map Donors and activation to numbers? 
 dict_activation = {'CD69-':0 , 'CD69+': 1}
@@ -234,31 +252,8 @@ df_heamap_all['Cell_Type'] = df_heamap_all['Cell_Type'].map(dict_cell_type)
 
 
 df_heamap_all.to_csv(path_output_heatmap_csv / f'{d}_AllCellData_hmap.csv')
-df_heamap_all.groupby(by=['Cell_Type','Donor'])['Cell_Type'].count()
 
 
-
-#%%
-
-####
-def train_test_split_B_NK_T(df_data, list_cols):
-    # B and NK 70:30 split
-    X_train, X_test, y_train, y_test = _train_test_split(df_data[df_data['Cell_Type'].isin(['B-Cells','NK-Cells',])], 
-                                                         list_cols, 
-                                                         classes, 
-                                                         test_size=0.5)
-    
-    # T 50:50 
-    X_train_t, X_test_t, y_train_t, y_test_t = _train_test_split(df_data[df_data['Cell_Type'].isin(['T-Cells',])], 
-                                                                 list_cols, 
-                                                                 classes, 
-                                                                 test_size=0.5)
-    X_train = pd.concat([X_train, X_train_t], ignore_index=True)
-    X_test = pd.concat([ X_test, X_test_t], ignore_index=True)
-    y_train =np.concatenate([y_train, y_train_t ])
-    y_test = np.concatenate([y_test, y_test_t ])
-    return  X_train, X_test, y_train, y_test
-#####
 #%% Section 4 - All cell activation classifier ROCs - Plot all curves together 
 
 #TODO FIGURE 5 D
