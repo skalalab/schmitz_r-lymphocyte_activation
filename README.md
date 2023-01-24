@@ -1,6 +1,10 @@
-# Optical metabolic imaging successfully classifies primary human lymphocyte activation
+# Autofluorescence lifetime imaging classifies human lymphocyte activation and subtype
+ 
 
----
+## Abstract
+New non-destructive tools are needed to reliably assess lymphocyte function for immune profiling and adoptive cell therapy. Optical metabolic imaging (OMI) is a label-free method that measures the autofluorescence intensity and lifetime of metabolic cofactors NAD(P)H and FAD to quantify metabolism at a single-cell level. Here, we investigate whether OMI can resolve metabolic changes between human quiescent versus IL4/CD40 activated B cells and IL12/IL15/IL18 activated memory-like NK cells. We found that quiescent B and NK cells were more oxidized compared to activated cells. Additionally, the NAD(P)H mean fluorescence lifetime decreased and the fraction of unbound NAD(P)H increased in the activated B and NK cells compared to quiescent cells. Machine learning classified B cells and NK cells according to activation state (CD69+) based on OMI parameters with up to 93.4% and 92.6% accuracy, respectively. Leveraging our previously published OMI data from activated and quiescent T cells, we found that the NAD(P)H mean fluorescence lifetime increased in NK cells compared to T cells, and further increased in B cells compared to NK cells. Random forest models based on OMI classified lymphocytes according to subtype (B, NK, T cell) with 97.8% accuracy, and according to activation state (quiescent or activated) and subtype (B, NK, T cell) with 90.0% accuracy. Our results show that autofluorescence lifetime imaging can accurately assess lymphocyte activation and subtype in a label-free, non-destructive manner.
+
+[Article on BioRxiv](https://www.biorxiv.org/content/10.1101/2023.01.23.525260v1)
 
 ## Contents
 
