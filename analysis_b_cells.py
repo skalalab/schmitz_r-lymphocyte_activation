@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May  2 16:27:55 2022
-
-@author: rschmitz
-"""
-
 #%% Section 1 - Import needed modules
 
 # from copy import deepcopy
@@ -26,7 +19,6 @@ from bokeh.io import export_svgs
 
 from pprint import pprint
 
-
 import holoviews as hv
 hv.extension("bokeh")
 from holoviews import opts
@@ -37,21 +29,19 @@ mpl.rcParams['figure.dpi'] = 300
 
 from helper import run_analysis_on_classifier, _train_test_split
 
-#%% Section 3 - Read in B-cell data
+#%% Section 2 - Read in B-cell data
 
-bcell_df = pd.read_csv('Data files/UMAPs, boxplots, ROC curves (Python)/Bcell_cyto_2group.csv')
+bcell_df = pd.read_csv('data/UMAPs, boxplots, ROC curves (Python)/Bcell_cyto_2group.csv')
 bcell_df.drop(['NADH', 'Experiment_Date'], axis=1, inplace=True)
 
 bcell_df['Act_Donor'] = bcell_df['Activation'] + ' ' + bcell_df['Donor']
-
-
 bcell_df.groupby(by=['Donor','Group','Activation'])['Cell_Type'].count()
 
 df_data = bcell_df.copy()
 
 classes = ['CD69-', 'CD69+']
 dict_classes = {label_int : label_class for label_int, label_class in enumerate(classes)}
-#%% Section 4 - ROC curves for different variable combos plotted together
+#%% Section 3 - ROC curves for different variable combos plotted together
 
 # F2 D
 # F2 C -- feature importances
@@ -188,7 +178,7 @@ pprint(dict_accuracies)
 df_acc = pd.DataFrame(dict_accuracies, index=[0])
 df_acc.to_csv('./figures/F2/F2_D_accuracies.csv')
 
- #%% Section 5 - Box-and-whisker/swarm plots with red and blue color coding
+ #%% Section 4 - Box-and-whisker/swarm plots with red and blue color coding
 
 df = bcell_df.copy()
 
@@ -256,7 +246,7 @@ plt.text((x1+x2)*.5, y+h, "****", ha='center', va='bottom', color=col, size = 40
 # plt.savefig('./figures/b/bcell_rr.svg',dpi=350)
 
 
-#%% Section 6 - ROC curves: Random forest, Logistic Regression, SVM 
+#%% Section 5 - ROC curves: Random forest, Logistic Regression, SVM 
 
 # SF2 F
 # SF2 CDE - confusion matrices
@@ -311,7 +301,7 @@ plt.savefig('./figures/SF2/SF2_F_RS_bcell_SVMLR_ROC.svg',dpi=350, bbox_inches='t
 
 plt.show()
 
-#%% Section 7 - B-cell UMAP - by CD69+ activation status
+#%% Section 6 - B-cell UMAP - by CD69+ activation status
 
 #list of parameters we want to use for the UMAP. I used ten OMI features (Normalized redox ratio, NAD(P)H lifetimes, FAD lifetimes, and cell size)
 
@@ -384,13 +374,10 @@ export_svgs(plot, filename = './figures/F2/F2_B_BCell_ActStatus_umap.svg')
 # hv.save(overlay, 'BCell_ActStatus_umap.html')
 
 
-#%%  Section 8 - B-cell UMAP - By donor
-
+#%%  Section 7 - B-cell UMAP - By donor
 
 # NF not in figure
-
 #Same structure as Section 7 - see comments above
-
 
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
 
@@ -456,14 +443,12 @@ plot.output_backend = "svg"
 # hv.save(overlay, 'BCell_Donor_umap.html')
 
 
-#%%  Section 9 - B-cell UMAP - by donor and activation 
-
+#%%  Section 8 - B-cell UMAP - by donor and activation 
 
 # SF2 B
 
 #Generate column in data frame that has both donor and activation status
 df_data['Donor_Activation'] = df_data['Donor'] + ': ' + df_data['Activation']
-
 
 #Same structure as Section 7 - see comments above
 list_omi_parameters = ['NADH_tm', 'NADH_a1', 'NADH_t1', 'NADH_t2', 'FAD_tm', 'FAD_a1', 'FAD_t1', 'FAD_t2', 'Norm_RR'] # , 'Cell_Size_Pix'
@@ -529,8 +514,7 @@ export_svgs(plot, filename = './figures/SF2/SF2_B_BCell_Donor_ActStatus_umap.svg
 # hv.save(overlay, 'BCell_Donor_ActStatus_umap.html')
 
 
-#%%  Section 10 - B-cell data UMAP with all groups (Activated + Quiescent, CD69+ and CD69-)
-
+#%%  Section 9 - B-cell data UMAP with all groups (Activated + Quiescent, CD69+ and CD69-)
 
 # SF2 A
 

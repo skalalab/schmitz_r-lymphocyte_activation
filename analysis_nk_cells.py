@@ -1,12 +1,4 @@
-#!/usr/bin/env python3
-
-# -*- coding: utf-8 -*-
-"""
-Created on Mon May  2 16:45:58 2022
-
-@author: rschmitz
-"""
-#%%  Section 1 
+#%%  Section 1 - Imports
 
 from copy import deepcopy
 
@@ -45,19 +37,9 @@ plt.rcParams['svg.fonttype'] = 'none'
 
 
 from helper import run_analysis_on_classifier, _train_test_split
-#%% Section 2
+#%% Section 2 - Loads and normalizes data
 
-
-path_nk_data = './Data files/UMAPs, boxplots, ROC curves (Python)/NK_donors_final_dec02.csv'
-nk_df = pd.read_csv(path_nk_data)
-
-# nk_df_temp = nk_df[((nk_df['Group']=='Activated') & (nk_df['Activation']=='CD69+')) | 
-#                 ((nk_df['Group']=='Control') & (nk_df['Activation']=='CD69-'))
-#                 ]
-
-nk_df.groupby(['Group','Donor', 'Activation'])['rr.mean'].mean()
-
-path_nk_data = './Data files/UMAPs, boxplots, ROC curves (Python)/NK_donors_final_dec02.csv'
+path_nk_data = './Data files/UMAPs, boxplots, ROC curves (Python)/NK_cells_dataset.csv'
 nk_df = pd.read_csv(path_nk_data)
 
 nk_df = nk_df.rename(columns={'n.t1.mean' : 'NADH_t1', 
@@ -259,7 +241,6 @@ df_acc.to_csv('./figures/F4/F4_D_accuracies.csv')
 
 
 #%% Section 4 - donor color coding boxplots: Red/blue, all dots visible
-
 
 # F3 FGHI
 

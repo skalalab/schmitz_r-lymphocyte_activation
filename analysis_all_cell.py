@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue May  3 10:57:16 2022
-
-@author: rschmitz
-"""
-
 #%% Section 1 - Import required packages
 
 from copy import deepcopy
@@ -50,16 +43,30 @@ from helper import run_analysis_on_classifier, _train_test_split
 from datetime import date 
 date_today = date.today()
 from pathlib import Path
-#%% Section 3 - Read in and set up dataframe 
+#%% INTERMEDIATE SECTION --> B cell data and appends T and NK data 
 
 #Read in dataframe    
 
-path_datasets = Path(r"./Data files/UMAPs, boxplots, ROC curves (Python)")
-all_df = pd.read_csv(path_datasets / 'AllCellData.csv')
+path_datasets = Path(r"./data/UMAPs, boxplots, ROC curves (Python)")
+all_df = pd.read_csv(path_datasets / 'archive' /'B_cell_data.csv')
 all_df['count'] = 1
 all_df.groupby(['Cell_Type','Activation'])['count'].count()
 
-#%% Remove and replace T cell data 
+#####
+cols_to_keep = ['NADH_t1',
+                'NADH_t2',
+                'NADH_a1',
+                'FAD_t1',
+                'FAD_t2',
+                'FAD_a1',
+                'Norm_RR',
+                'NADH_tm',
+                'FAD_tm',
+                'Donor',
+                'Activation',
+                'Cell_Type']
+
+##%% Add T cell data
 
 df_t_cells_labeled = pd.read_csv(path_datasets / 'CD3Test_CD69labeled.csv')
 df_t_cells_labeled.groupby(by=["Donor",'Activation'])['RR'].mean()
@@ -99,18 +106,20 @@ df_t_cells_labeled.groupby(by=["Donor",'Activation'])['Norm_RR'].mean()
 
 df_t_cells_labeled['count'] = 1
 
-# Replace T cell data
-all_df = all_df[all_df['Cell_Type'] != 'T-cells']
-all_df = pd.concat([all_df, df_t_cells_labeled])
+# Remove T cell data if any
+# all_df = all_df[all_df['Cell_Type'] != 'T-cells']
+all_df = pd.concat([all_df[cols_to_keep], df_t_cells_labeled[cols_to_keep]])
 
-all_df.groupby(['Cell_Type','Activation'])['count'].count()
+# all_df.groupby(['Cell_Type','Activation'])['count'].count()
 
 
-#%% Remove old NK donors and add new ones
+##%% append NK Data
+
+# remove NK data if any
 all_df = all_df[all_df['Cell_Type'] != 'NK-Cells']
 
 # load new nk cells 
-df_nk = pd.read_csv('Data files/UMAPs, boxplots, ROC curves (Python)/NK_donors_final_dec02.csv')
+df_nk = pd.read_csv('data/UMAPs, boxplots, ROC curves (Python)/NK_cells_dataset.csv')
 df_nk = df_nk.rename(columns={'n.t1.mean' : 'NADH_t1', 
                               'n.t2.mean' : 'NADH_t2', 
                               'n.a1.mean' : 'NADH_a1', 
@@ -144,20 +153,20 @@ df_nk = df_nk[((df_nk['Group']=='Activated') & (df_nk['Activation']=='CD69+')) |
 df_nk.groupby(['Donor','Group', 'Activation'])['Cell_Type'].count()
 
 ## Concat dicts
-df_concat = pd.concat([all_df,df_nk])
+df_concat = pd.concat([all_df[cols_to_keep],df_nk[cols_to_keep]])
 df_concat['Donor'].unique()
 df_concat['Cell_Type'].unique()
 
 all_df = df_concat
 
 ##%%%
-print(all_df.groupby(by=['Cell_Type','Group','Activation',])['Cell_Size_Pix'].count())
+# print(all_df.groupby(by=['Cell_Type','Group','Activation',])['Cell_Size_Pix'].count())
 print("*" * 20)
 print(all_df.groupby(by=['Cell_Type','Donor','Activation'])['Norm_RR'].mean())
 print(all_df.groupby(by=['Cell_Type','Activation'])['Norm_RR'].count())
 
 #Add combination variables to data set
-all_df.drop(['NADH', 'Group', 'Experiment_Date'], axis=1, inplace=True)
+# all_df.drop(['NADH', 'Group', 'Experiment_Date'], axis=1, inplace=True)
 all_df['Type_Activation'] = all_df['Cell_Type'] + ': ' + all_df['Activation']
 all_df['Donor_Activation'] = all_df['Cell_Type'] +' '+ all_df['Donor'] + ': ' + all_df['Activation']
 all_df['Donor_CellType'] = all_df['Donor'] + ': ' + all_df['Cell_Type'] 
@@ -173,10 +182,16 @@ d = str(date_today.year) + str(date_today.month).zfill(2) + str(date_today.day).
 
 all_df.groupby(by=['Cell_Type','Activation'])['Cell_Type'].count()
 
-# replace T cell donor B for G
+# Create unique labels for T cell donor B
 all_df.loc[(all_df['Cell_Type'] == 'T-Cells') &  (all_df['Donor'] =='B'), 'Donor'] = 'G'
 
-all_df.to_csv(f"./Data files/ecg_feature_exports/{d}_all_data_including_new_nk_normalized_donor.csv", index=False)
+all_df.to_csv(f"./data/UMAPs, boxplots, ROC curves (Python)/all_data.csv", index=False)
+
+
+
+#%%
+path_datasets = Path(r"./data/UMAPs, boxplots, ROC curves (Python)")
+all_df = pd.read_csv(path_datasets / 'all_data.csv')
 
 #%% export dataframe for heatmap
 

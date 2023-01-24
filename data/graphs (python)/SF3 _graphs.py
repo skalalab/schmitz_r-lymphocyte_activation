@@ -20,7 +20,7 @@ import os
 path_main = Path(r'Z:\Rebecca\lymphocyte data\NK cell repeats')
 path_save = Path(r'C:\Users\jriendeau\Documents\GitHub\schmitz_r-lymphocyte_activation\figures\SF3')
 
-csv_path = path_main / 'NK_donors_final_dec02.csv'
+csv_path = path_main / 'NK_cells_dataset.csv'
 all_df = pd.read_csv(csv_path)
 df_data = all_df.copy()
 
